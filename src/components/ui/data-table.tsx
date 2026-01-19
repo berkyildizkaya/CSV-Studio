@@ -8,6 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
   Row,
+  RowSelectionState,
 } from "@tanstack/react-table"
 import { useVirtualizer } from "@tanstack/react-virtual"
 
@@ -20,6 +21,9 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { RowFormDialog } from "@/components/add-row-dialog"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Trash2 } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -27,6 +31,7 @@ interface DataTableProps<TData, TValue> {
   onInsertRow?: (index: number, newData: any) => void
   onDeleteRow?: (index: number) => void
   onUpdateRow?: (index: number, newData: any) => void
+  onDeleteMultiple?: (indices: number[]) => void
 }
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
@@ -63,18 +68,21 @@ const DataTableRow = React.memo(({
     virtualRow, 
     visibleCells,
     columnSizingInfo,
+    isSelected, // Yeni Prop
 }: { 
     row: Row<any>, 
     virtualRow: any, 
     visibleCells: any[],
     columnSizingInfo: any,
+    isSelected: boolean, // Yeni Prop Tipi
 }) => {
     // columnSizingInfo'nun kullanıldığını TS'e bildirmek için
     void columnSizingInfo;
+    void row;
 
     return (
       <TableRow
-          data-state={row.getIsSelected() && "selected"}
+          data-state={isSelected && "selected"} // row.getIsSelected() yerine prop kullan
           className="flex hover:bg-muted/50 absolute w-full transition-none border-b items-stretch group"
           style={{
               transform: `translateY(${virtualRow.start}px)`,
@@ -82,10 +90,11 @@ const DataTableRow = React.memo(({
           }}
       >
           {visibleCells.map((cell) => {
+              const isSelectColumn = cell.column.id === "select";
               return (
                   <TableCell
                       key={cell.id}
-                      className="p-3 flex items-center border-r overflow-hidden h-full min-h-[45px]"
+                      className={`flex items-center border-r overflow-hidden h-full min-h-[45px] ${isSelectColumn ? "p-0" : "p-3"}`}
                       style={{ width: cell.column.getSize() }}
                   >
                       <div className="w-full h-full flex items-center overflow-hidden min-h-[20px]">
@@ -97,6 +106,9 @@ const DataTableRow = React.memo(({
       </TableRow>
     );
 }, (prevProps, nextProps) => {
+    // Seçim durumu değişirse KESİN render et
+    if (prevProps.isSelected !== nextProps.isSelected) return false;
+
     if (prevProps.row !== nextProps.row) return false;
     if (prevProps.virtualRow.start !== nextProps.virtualRow.start) return false;
     if (prevProps.visibleCells.length !== nextProps.visibleCells.length) return false;
@@ -111,10 +123,12 @@ function DataTableInner<TData, TValue>({
   data,
   onInsertRow,
   onDeleteRow,
-  onUpdateRow
+  onUpdateRow,
+  onDeleteMultiple
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = React.useState("")
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
   
   // Dialog State
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -143,11 +157,15 @@ function DataTableInner<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
+    onRowSelectionChange: setRowSelection,
     enableColumnResizing: true,
     columnResizeMode: "onChange",
+    enableRowSelection: true,
+    getRowId: (_, index) => String(index), // Satırları indeks ile kimliklendir
     state: {
       sorting,
       globalFilter,
+      rowSelection,
     },
     // Meta üzerinden fonksiyonları hücrelere taşıyoruz
     meta: {
@@ -192,6 +210,16 @@ function DataTableInner<TData, TValue>({
     }
   };
 
+  const handleDeleteSelected = () => {
+    const selectedIndices = Object.keys(rowSelection).map(Number);
+    if (onDeleteMultiple && selectedIndices.length > 0) {
+        if (confirm(`${selectedIndices.length} adet satırı silmek istediğinize emin misiniz?`)) {
+            onDeleteMultiple(selectedIndices);
+            setRowSelection({}); // Seçimi temizle
+        }
+    }
+  };
+
   return (
     <div className="flex flex-col h-full gap-4">
       {/* Generic Row Dialog (Add or Edit) */}
@@ -204,13 +232,36 @@ function DataTableInner<TData, TValue>({
         onSave={handleSaveRow}
       />
 
-      <div className="flex items-center">
-        <input
-          placeholder="Ara..."
-          value={globalFilter ?? ""}
-          onChange={(event) => setGlobalFilter(event.target.value)}
-          className="max-w-sm flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-        />
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2 flex-1">
+            <div className="flex items-center gap-2 px-3 py-2 border rounded-md bg-card">
+                <Checkbox
+                    checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    aria-label="Tümünü seç"
+                />
+                <span className="text-sm font-medium">Tümünü Seç</span>
+            </div>
+
+            <input
+            placeholder="Ara..."
+            value={globalFilter ?? ""}
+            onChange={(event) => setGlobalFilter(event.target.value)}
+            className="max-w-sm flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+            />
+        </div>
+        
+        {Object.keys(rowSelection).length > 0 && (
+            <Button 
+                variant="destructive" 
+                size="sm" 
+                onClick={handleDeleteSelected}
+                className="animate-in fade-in zoom-in duration-200"
+            >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Seçilenleri Sil ({Object.keys(rowSelection).length})
+            </Button>
+        )}
       </div>
       
       <div 
@@ -272,6 +323,7 @@ function DataTableInner<TData, TValue>({
                     virtualRow={virtualRow} 
                     visibleCells={visibleCells} 
                     columnSizingInfo={columnSizingInfo}
+                    isSelected={row.getIsSelected()} // Prop'u geçir
                   />
                 )
               })

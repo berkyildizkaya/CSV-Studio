@@ -2,15 +2,16 @@ import { useMemo } from "react";
 import { useCsv } from "@/hooks/use-csv";
 import { DataTable } from "@/components/ui/data-table";
 import { EditableCell } from "@/components/editable-cell";
+import { SelectCell } from "@/components/select-cell";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 
 export default function App() {
-  const { fileName, rowCount, headers, data, isLoading, error, loadCsvFile, updateCell, insertRow, deleteRow, updateRow } = useCsv();
+  const { fileName, rowCount, headers, data, isLoading, error, loadCsvFile, updateCell, insertRow, deleteRow, updateRow, deleteMultipleRows } = useCsv();
 
   // CSV başlıklarından tablo sütunlarını dinamik olarak oluştur
   const columns = useMemo(() => {
-    return headers.map((header) => ({
+    const dynamicColumns = headers.map((header) => ({
       id: header, // Benzersiz ID (accessorKey yerine)
       accessorFn: (row: any) => row[header], // Veriye doğrudan erişim
       header: ({ column }) => {
@@ -40,6 +41,30 @@ export default function App() {
       enableSorting: true,
       enableGlobalFilter: true,
     } as ColumnDef<any>));
+
+    // Seçim sütununu en başa ekle
+    const selectionColumn: ColumnDef<any> = {
+        id: "select",
+        size: 40,
+        minSize: 40,
+        maxSize: 40,
+        header: () => (
+          <div className="flex items-center justify-center w-full h-full text-muted-foreground text-xs">
+             #
+          </div>
+        ),
+        cell: ({ row }) => (
+          <SelectCell 
+            isSelected={row.getIsSelected()} 
+            onToggle={row.toggleSelected} 
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+        enableResizing: false,
+    };
+
+    return [selectionColumn, ...dynamicColumns];
   }, [headers]);
 
   if (data.length > 0) {
@@ -79,6 +104,7 @@ export default function App() {
              onInsertRow={insertRow}
              onDeleteRow={deleteRow}
              onUpdateRow={updateRow}
+             onDeleteMultiple={deleteMultipleRows}
            />
         </div>
       </div>

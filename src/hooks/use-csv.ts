@@ -135,20 +135,30 @@ export function useCsv() {
               });
             };
           
-            const updateRow = (rowIndex: number, newRowData: any) => {
-              setState((prev) => {
-                const newData = [...prev.data];
-                newData[rowIndex] = newRowData;
-                return { ...prev, data: newData };
-              });
-            };
-          
-            return {
-              ...state,
-              loadCsvFile,
-              updateCell,
-              insertRow,
-              deleteRow,
-              updateRow,
-            };
-          }
+              const updateRow = (rowIndex: number, newRowData: any) => {
+                setState((prev) => {
+                  const newData = [...prev.data];
+                  newData[rowIndex] = newRowData;
+                  return { ...prev, data: newData };
+                });
+              };
+            
+              const deleteMultipleRows = (rowIndices: number[]) => {
+                setState((prev) => {
+                  // Set kullanarak O(1) lookup performansı sağlayalım
+                  const indicesToDelete = new Set(rowIndices);
+                  const newData = prev.data.filter((_, index) => !indicesToDelete.has(index));
+                  return { ...prev, data: newData, rowCount: newData.length };
+                });
+              };
+            
+              return {
+                ...state,
+                loadCsvFile,
+                updateCell,
+                insertRow,
+                deleteRow,
+                updateRow,
+                deleteMultipleRows,
+              };
+            }
