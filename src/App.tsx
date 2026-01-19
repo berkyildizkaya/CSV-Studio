@@ -4,6 +4,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { EditableCell } from "@/components/editable-cell";
 import { SelectCell } from "@/components/select-cell";
 import { FindReplaceDialog } from "@/components/find-replace-dialog";
+import { SaveConfigDialog } from "@/components/save-config-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Search, Save, ChevronDown, Languages } from "lucide-react";
@@ -16,6 +17,7 @@ export default function App() {
     rowCount, 
     headers, 
     data, 
+    delimiter,
     isLoading, 
     error, 
     loadCsvFile, 
@@ -29,9 +31,20 @@ export default function App() {
   } = useCsv();
 
   const [isFindReplaceOpen, setIsFindReplaceOpen] = useState(false);
+  const [isSaveConfigOpen, setIsSaveConfigOpen] = useState(false);
+  const [isSaveAs, setIsSaveAs] = useState(false);
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
+  };
+
+  const handleSaveClick = (as: boolean) => {
+    setIsSaveAs(as);
+    setIsSaveConfigOpen(true);
+  };
+
+  const handleSaveConfigConfirm = (config: { delimiter: string, includeSep: boolean }) => {
+    saveCsvFile(isSaveAs, config);
   };
 
   // CSV başlıklarından tablo sütunlarını dinamik olarak oluştur
@@ -140,7 +153,7 @@ export default function App() {
             
             <div className="flex items-center rounded-md bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 h-9">
                 <button 
-                    onClick={() => saveCsvFile(false)}
+                    onClick={() => handleSaveClick(false)}
                     className="inline-flex items-center justify-center whitespace-nowrap rounded-l-md text-sm font-medium px-4 py-2 border-r border-primary-foreground/20 hover:bg-primary/90 h-full"
                 >
                     <Save className="w-4 h-4 mr-2" />
@@ -153,7 +166,7 @@ export default function App() {
                         </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => saveCsvFile(true)}>
+                        <DropdownMenuItem onClick={() => handleSaveClick(true)}>
                             {t('app.save_as')}
                         </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -179,6 +192,13 @@ export default function App() {
             onOpenChange={setIsFindReplaceOpen} 
             headers={headers} 
             onFindAndReplace={findAndReplace} 
+        />
+
+        <SaveConfigDialog 
+            open={isSaveConfigOpen} 
+            onOpenChange={setIsSaveConfigOpen} 
+            defaultDelimiter={delimiter}
+            onConfirm={handleSaveConfigConfirm}
         />
       </div>
     );

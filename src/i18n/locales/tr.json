@@ -34,6 +34,17 @@
     "success_msg": "{{count}} adet kayıt güncellendi.",
     "not_found": "Değiştirilecek kayıt bulunamadı."
   },
+  "save_config": {
+    "desc": "Dosya formatı ve ayırıcı seçeneklerini belirleyin.",
+    "delimiter_label": "Sütun Ayırıcı (Delimiter)",
+    "excel_compat_label": "Excel Uyumluluk Modu (sep=)",
+    "excel_compat_desc": "Dosyanın başına Excel'in ayırıcıyı tanımasını sağlayan bir satır ekler.",
+    "continue": "Devam Et",
+    "comma": "Virgül ( , )",
+    "semicolon": "Noktalı Virgül ( ; )",
+    "tab": "Tab ( \\t )",
+    "pipe": "Dik Çizgi ( | )"
+  },
   "toast": {
     "file_loaded": "Dosya başarıyla yüklendi",
     "file_saved": "Dosya başarıyla kaydedildi",

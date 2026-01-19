@@ -34,6 +34,17 @@
     "success_msg": "{{count}} Datensätze aktualisiert.",
     "not_found": "Keine Datensätze zum Ersetzen gefunden."
   },
+  "save_config": {
+    "desc": "Wählen Sie Dateiformat und Trennzeichen-Optionen.",
+    "delimiter_label": "Spaltentrennzeichen",
+    "excel_compat_label": "Excel-Kompatibilitätsmodus (sep=)",
+    "excel_compat_desc": "Fügt am Anfang der Datei eine Zeile hinzu, damit Excel das Trennzeichen erkennt.",
+    "continue": "Fortfahren",
+    "comma": "Komma ( , )",
+    "semicolon": "Semikolon ( ; )",
+    "tab": "Tab ( \\t )",
+    "pipe": "Senkrechter Strich ( | )"
+  },
   "toast": {
     "file_loaded": "Datei erfolgreich geladen",
     "file_saved": "Datei erfolgreich gespeichert",

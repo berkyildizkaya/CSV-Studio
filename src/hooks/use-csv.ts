@@ -9,6 +9,7 @@ interface CsvState {
   data: any[];
   headers: string[];
   fileName: string | null;
+  delimiter: string;
   rowCount: number;
   isLoading: boolean;
   error: string | null;
@@ -20,6 +21,7 @@ export function useCsv() {
     data: [],
     headers: [],
     fileName: null,
+    delimiter: ",",
     rowCount: 0,
     isLoading: false,
     error: null,
@@ -79,11 +81,13 @@ export function useCsv() {
         complete: (results) => {
             const data = results.data;
             const headers = data.length > 0 ? Object.keys(data[0] as object) : [];
+            const detectedDelimiter = results.meta.delimiter || ",";
             
             setState({
                 data,
                 headers,
                 fileName: filePath,
+                delimiter: detectedDelimiter,
                 rowCount: data.length,
                 isLoading: false,
                 error: null,
@@ -114,7 +118,10 @@ export function useCsv() {
     }
   };
 
-  const saveCsvFile = async (saveAs: boolean = false) => {
+  const saveCsvFile = async (
+    saveAs: boolean = false, 
+    config?: { delimiter: string, includeSep: boolean }
+  ) => {
     if (!state.data || state.data.length === 0) {
       toast.error(t('toast.no_data_to_save'));
       return;
@@ -122,17 +129,16 @@ export function useCsv() {
 
     try {
       let filePath = state.fileName;
+      const targetDelimiter = config?.delimiter || state.delimiter;
 
       // Eğer "Farklı Kaydet" isteniyorsa veya henüz bir dosya yolu yoksa
       if (saveAs || !filePath) {
-        console.log("Opening save dialog...");
         const selectedPath = await save({
           title: saveAs ? t('app.save_as') : t('app.save'),
           filters: [{ name: "CSV Dosyası", extensions: ["csv"] }],
           defaultPath: filePath || "data.csv",
         });
 
-        console.log("Save dialog result:", selectedPath);
         if (!selectedPath) {
           return; // Kullanıcı iptal etti
         }
@@ -143,14 +149,18 @@ export function useCsv() {
 
       // Datayı CSV formatına çevir
       const csvContent = Papa.unparse(state.data, {
-        quotes: true,
+        quotes: true, // Her hücreyi tırnak içine al (En güvenli yöntem)
+        delimiter: targetDelimiter,
         header: true,
       });
 
-      // Dosyaya yaz
-      await saveFileContent(filePath, csvContent);
+      // Excel uyumluluk modu (sep=)
+      const finalContent = config?.includeSep ? `sep=${targetDelimiter}\n${csvContent}` : csvContent;
 
-      setState((prev) => ({ ...prev, fileName: filePath }));
+      // Dosyaya yaz
+      await saveFileContent(filePath, finalContent);
+
+      setState((prev) => ({ ...prev, fileName: filePath, delimiter: targetDelimiter }));
       
       toast.success(t('toast.file_saved'), {
         id: toastId,
