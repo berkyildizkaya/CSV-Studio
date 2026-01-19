@@ -1,4 +1,4 @@
-import { readFile } from "@tauri-apps/plugin-fs";
+import { readFile, writeTextFile } from "@tauri-apps/plugin-fs";
 
 /**
  * Binary buffer içeriğini analiz ederek doğru encoding ile string'e çevirir.
@@ -36,4 +36,11 @@ export function decodeFileContent(buffer: Uint8Array): string {
 export async function readAndDecodeFile(filePath: string): Promise<string> {
   const buffer = await readFile(filePath);
   return decodeFileContent(buffer);
+}
+
+/**
+ * Belirtilen yola metin içeriğini yazar.
+ */
+export async function saveFileContent(filePath: string, content: string): Promise<void> {
+  await writeTextFile(filePath, content);
 }

@@ -1,13 +1,32 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useCsv } from "@/hooks/use-csv";
 import { DataTable } from "@/components/ui/data-table";
 import { EditableCell } from "@/components/editable-cell";
 import { SelectCell } from "@/components/select-cell";
+import { FindReplaceDialog } from "@/components/find-replace-dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Search, Save, ChevronDown } from "lucide-react";
 
 export default function App() {
-  const { fileName, rowCount, headers, data, isLoading, error, loadCsvFile, updateCell, insertRow, deleteRow, updateRow, deleteMultipleRows } = useCsv();
+  const { 
+    fileName, 
+    rowCount, 
+    headers, 
+    data, 
+    isLoading, 
+    error, 
+    loadCsvFile, 
+    saveCsvFile,
+    updateCell, 
+    insertRow, 
+    deleteRow, 
+    updateRow, 
+    deleteMultipleRows,
+    findAndReplace 
+  } = useCsv();
+
+  const [isFindReplaceOpen, setIsFindReplaceOpen] = useState(false);
 
   // CSV başlıklarından tablo sütunlarını dinamik olarak oluştur
   const columns = useMemo(() => {
@@ -83,16 +102,42 @@ export default function App() {
             </div>
           </div>
           
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => setIsFindReplaceOpen(true)}
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+            >
+              <Search className="w-4 h-4 mr-2" />
+              Bul ve Değiştir
+            </button>
              <button
               onClick={loadCsvFile}
               className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
             >
               Farklı Dosya Aç
             </button>
-            <button className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2">
-              Dışa Aktar
-            </button>
+            
+            <div className="flex items-center rounded-md bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 h-9">
+                <button 
+                    onClick={() => saveCsvFile(false)}
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-l-md text-sm font-medium px-4 py-2 border-r border-primary-foreground/20 hover:bg-primary/90 h-full"
+                >
+                    <Save className="w-4 h-4 mr-2" />
+                    Kaydet
+                </button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <button className="inline-flex items-center justify-center px-2 py-2 rounded-r-md hover:bg-primary/90 h-full focus:outline-none">
+                            <ChevronDown className="w-4 h-4" />
+                        </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => saveCsvFile(true)}>
+                            Farklı Kaydet...
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
           </div>
         </div>
 
@@ -107,6 +152,13 @@ export default function App() {
              onDeleteMultiple={deleteMultipleRows}
            />
         </div>
+        
+        <FindReplaceDialog 
+            open={isFindReplaceOpen} 
+            onOpenChange={setIsFindReplaceOpen} 
+            headers={headers} 
+            onFindAndReplace={findAndReplace} 
+        />
       </div>
     );
   }
