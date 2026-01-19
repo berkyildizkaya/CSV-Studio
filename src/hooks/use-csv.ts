@@ -54,11 +54,27 @@ export function useCsv() {
       }
 
       // Dosyayı oku ve decode et
-      const content = await readAndDecodeFile(filePath);
+      let content = await readAndDecodeFile(filePath);
+      let delimiter = ""; // Boş bırakılırsa PapaParse otomatik algılar
+
+      // "sep=" kontrolü (Excel metadata satırı)
+      // Örnek: sep=; veya sep=,
+      const firstLineEndIndex = content.indexOf('\n');
+      if (firstLineEndIndex !== -1) {
+        const firstLine = content.substring(0, firstLineEndIndex).trim();
+        if (firstLine.startsWith("sep=")) {
+           // Ayırıcıyı al (sep='den sonraki karakter)
+           delimiter = firstLine.substring(4).trim();
+           // İlk satırı içerikten çıkar
+           content = content.substring(firstLineEndIndex + 1);
+           console.log(`Excel separator detected: '${delimiter}'. First line removed.`);
+        }
+      }
 
       // Parse et
       Papa.parse(content, {
         header: true,
+        delimiter: delimiter, // Algılanan ayırıcıyı kullan
         skipEmptyLines: true,
         complete: (results) => {
             const data = results.data;
