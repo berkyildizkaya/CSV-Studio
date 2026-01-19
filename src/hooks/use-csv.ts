@@ -107,17 +107,48 @@ export function useCsv() {
           }
         };
       
-        const updateCell = (rowIndex: number, columnId: string, value: any) => {
-          setState((prev) => {
-            const newData = [...prev.data];
-            newData[rowIndex] = { ...newData[rowIndex], [columnId]: value };
-            return { ...prev, data: newData };
-          });
-        };
-      
-        return {
-          ...state,
-          loadCsvFile,
-          updateCell,
-        };
-      }
+          const updateCell = (rowIndex: number, columnId: string, value: any) => {
+            setState((prev) => {
+              const newData = [...prev.data];
+              newData[rowIndex] = { ...newData[rowIndex], [columnId]: value };
+              return { ...prev, data: newData };
+            });
+          };
+        
+            const insertRow = (rowIndex: number, newRowData?: any) => {
+              setState((prev) => {
+                // Eğer veri gelmediyse boş şablon oluştur
+                const rowToAdd = newRowData || prev.headers.reduce((acc, header) => ({ ...acc, [header]: "" }), {});
+                
+                const newData = [...prev.data];
+                // Belirtilen index'in önüne ekle
+                newData.splice(rowIndex, 0, rowToAdd);
+                
+                return { ...prev, data: newData, rowCount: newData.length };
+              });
+            };        
+            const deleteRow = (rowIndex: number) => {
+              setState((prev) => {
+                const newData = [...prev.data];
+                newData.splice(rowIndex, 1);
+                return { ...prev, data: newData, rowCount: newData.length };
+              });
+            };
+          
+            const updateRow = (rowIndex: number, newRowData: any) => {
+              setState((prev) => {
+                const newData = [...prev.data];
+                newData[rowIndex] = newRowData;
+                return { ...prev, data: newData };
+              });
+            };
+          
+            return {
+              ...state,
+              loadCsvFile,
+              updateCell,
+              insertRow,
+              deleteRow,
+              updateRow,
+            };
+          }

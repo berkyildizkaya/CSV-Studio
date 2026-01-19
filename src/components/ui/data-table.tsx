@@ -19,10 +19,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { RowFormDialog } from "@/components/add-row-dialog"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  onInsertRow?: (index: number, newData: any) => void
+  onDeleteRow?: (index: number) => void
+  onUpdateRow?: (index: number, newData: any) => void
 }
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
@@ -53,54 +57,49 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
   }
 }
 
-// Performans için memoize edilmiş Satır Bileşeni
+// Performans için memoize edilmiş Satır Bileşeni (ContextMenu kaldırıldı)
 const DataTableRow = React.memo(({ 
     row, 
     virtualRow, 
     visibleCells,
-    columnSizingInfo // Resize durumunu takip etmek için eklendi
+    columnSizingInfo,
 }: { 
     row: Row<any>, 
     virtualRow: any, 
     visibleCells: any[],
-    columnSizingInfo: any
+    columnSizingInfo: any,
 }) => {
-    // columnSizingInfo'nun kullanıldığını TS'e bildirmek için (Hata TS6133)
-    // Aslında memo karşılaştırmasında kullanılıyor.
+    // columnSizingInfo'nun kullanıldığını TS'e bildirmek için
     void columnSizingInfo;
 
     return (
-        <TableRow
-            data-state={row.getIsSelected() && "selected"}
-            className="flex hover:bg-muted/50 absolute w-full transition-none border-b items-stretch"
-            style={{
-                transform: `translateY(${virtualRow.start}px)`,
-                height: `${virtualRow.size}px`,
-            }}
-        >
-            {visibleCells.map((cell) => {
-                return (
-                    <TableCell
-                        key={cell.id}
-                        className="p-3 flex items-center border-r overflow-hidden h-full min-h-[45px]"
-                        style={{ width: cell.column.getSize() }}
-                    >
-                        <div className="w-full h-full flex items-center overflow-hidden min-h-[20px]">
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </div>
-                    </TableCell>
-                )
-            })}
-        </TableRow>
+      <TableRow
+          data-state={row.getIsSelected() && "selected"}
+          className="flex hover:bg-muted/50 absolute w-full transition-none border-b items-stretch group"
+          style={{
+              transform: `translateY(${virtualRow.start}px)`,
+              height: `${virtualRow.size}px`,
+          }}
+      >
+          {visibleCells.map((cell) => {
+              return (
+                  <TableCell
+                      key={cell.id}
+                      className="p-3 flex items-center border-r overflow-hidden h-full min-h-[45px]"
+                      style={{ width: cell.column.getSize() }}
+                  >
+                      <div className="w-full h-full flex items-center overflow-hidden min-h-[20px]">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </div>
+                  </TableCell>
+              )
+          })}
+      </TableRow>
     );
 }, (prevProps, nextProps) => {
-    // Sadece önemli değişikliklerde render et
     if (prevProps.row !== nextProps.row) return false;
     if (prevProps.virtualRow.start !== nextProps.virtualRow.start) return false;
     if (prevProps.visibleCells.length !== nextProps.visibleCells.length) return false;
-    
-    // Resize işlemi devam ediyorsa veya bittiyse render et
-    // columnSizingInfo.isResizingColumn değerine bakıyoruz
     if (prevProps.columnSizingInfo !== nextProps.columnSizingInfo) return false;
     
     return true; 
@@ -110,9 +109,31 @@ const DataTableRow = React.memo(({
 function DataTableInner<TData, TValue>({
   columns,
   data,
+  onInsertRow,
+  onDeleteRow,
+  onUpdateRow
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = React.useState("")
+  
+  // Dialog State
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [targetRowIndex, setTargetRowIndex] = React.useState<number | null>(null);
+  const [editingRowData, setEditingRowData] = React.useState<any | null>(null);
+
+  // Insert Dialog
+  const handleOpenInsertDialog = React.useCallback((index: number) => {
+    setTargetRowIndex(index);
+    setEditingRowData(null); // Ekleme modu
+    setIsDialogOpen(true);
+  }, []);
+
+  // Edit Dialog
+  const handleOpenEditDialog = React.useCallback((index: number, data: any) => {
+    setTargetRowIndex(index);
+    setEditingRowData(data); // Düzenleme modu
+    setIsDialogOpen(true);
+  }, []);
 
   const table = useReactTable({
     data,
@@ -128,12 +149,17 @@ function DataTableInner<TData, TValue>({
       sorting,
       globalFilter,
     },
+    // Meta üzerinden fonksiyonları hücrelere taşıyoruz
+    meta: {
+        onEditRow: handleOpenEditDialog,
+        onInsertRow: handleOpenInsertDialog,
+        onDeleteRow: onDeleteRow
+    }
   })
 
   const { rows } = table.getRowModel()
-  const columnSizingInfo = table.getState().columnSizingInfo; // Resize bilgisini al
+  const columnSizingInfo = table.getState().columnSizingInfo; 
   
-  // Sanallaştırma için container referansı
   const tableContainerRef = React.useRef<HTMLDivElement>(null)
 
   const rowVirtualizer = useVirtualizer({
@@ -147,11 +173,37 @@ function DataTableInner<TData, TValue>({
 
   const virtualRows = getVirtualRows()
   
-  // Tablonun toplam genişliğini hesapla
   const totalTableWidth = table.getTotalSize()
+
+  // Sütun başlıklarını çıkar (AccessorKey veya ID üzerinden)
+  const headers = React.useMemo(() => {
+     return columns.map(col => (col as any).accessorKey || col.id || "").filter(Boolean);
+  }, [columns]);
+
+  const handleSaveRow = (newData: any) => {
+    if (targetRowIndex !== null) {
+        if (editingRowData) {
+            // Düzenleme kaydı
+            onUpdateRow?.(targetRowIndex, newData);
+        } else {
+            // Ekleme kaydı
+            onInsertRow?.(targetRowIndex, newData);
+        }
+    }
+  };
 
   return (
     <div className="flex flex-col h-full gap-4">
+      {/* Generic Row Dialog (Add or Edit) */}
+      <RowFormDialog 
+        open={isDialogOpen} 
+        onOpenChange={setIsDialogOpen}
+        headers={headers}
+        sampleData={data as any[]}
+        initialData={editingRowData} 
+        onSave={handleSaveRow}
+      />
+
       <div className="flex items-center">
         <input
           placeholder="Ara..."
@@ -188,7 +240,6 @@ function DataTableInner<TData, TValue>({
                             header.column.columnDef.header,
                             header.getContext()
                           )}
-                      {/* Resizer Handle */}
                       <div
                         onMouseDown={header.getResizeHandler()}
                         onTouchStart={header.getResizeHandler()}
@@ -220,7 +271,7 @@ function DataTableInner<TData, TValue>({
                     row={row} 
                     virtualRow={virtualRow} 
                     visibleCells={visibleCells} 
-                    columnSizingInfo={columnSizingInfo} // Prop olarak geçiliyor
+                    columnSizingInfo={columnSizingInfo}
                   />
                 )
               })

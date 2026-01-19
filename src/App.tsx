@@ -6,7 +6,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 
 export default function App() {
-  const { fileName, rowCount, headers, data, isLoading, error, loadCsvFile, updateCell } = useCsv();
+  const { fileName, rowCount, headers, data, isLoading, error, loadCsvFile, updateCell, insertRow, deleteRow, updateRow } = useCsv();
 
   // CSV başlıklarından tablo sütunlarını dinamik olarak oluştur
   const columns = useMemo(() => {
@@ -24,12 +24,14 @@ export default function App() {
           </button>
         )
       },
-      cell: ({ row, column, getValue }) => (
+      cell: ({ row, column, getValue, table }) => (
         <EditableCell
           getValue={getValue}
           rowIndex={row.index}
           columnId={column.id}
           updateData={updateCell}
+          tableMeta={table.options.meta}
+          rowData={row.original}
         />
       ),
       size: 150, // Varsayılan genişlik
@@ -71,7 +73,13 @@ export default function App() {
 
         {/* Tablo Alanı */}
         <div className="flex-1 overflow-hidden p-4">
-           <DataTable columns={columns} data={data} />
+           <DataTable 
+             columns={columns} 
+             data={data} 
+             onInsertRow={insertRow}
+             onDeleteRow={deleteRow}
+             onUpdateRow={updateRow}
+           />
         </div>
       </div>
     );

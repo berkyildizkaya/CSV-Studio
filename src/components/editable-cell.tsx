@@ -8,6 +8,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -21,6 +29,9 @@ interface EditableCellProps {
   rowIndex: number;
   columnId: string;
   updateData: (rowIndex: number, columnId: string, value: any) => void;
+  // Table meta verisine erişim için
+  tableMeta?: any; 
+  rowData?: any;
 }
 
 // Değerin tipini tahmin eden yardımcı fonksiyon
@@ -47,6 +58,8 @@ function EditableCellComponent({
   rowIndex,
   columnId,
   updateData,
+  tableMeta,
+  rowData
 }: EditableCellProps) {
   const initialValue = getValue();
   const [value, setValue] = useState(initialValue);
@@ -141,14 +154,37 @@ function EditableCellComponent({
 
   return (
     <>
-      <div
-        className="group flex items-center justify-between w-full h-full min-h-[2rem] px-2 py-1 rounded-md border border-transparent hover:border-border hover:bg-muted/50 cursor-pointer transition-all"
-        onDoubleClick={() => setOpen(true)}
-        title="Düzenlemek için çift tıklayın"
-      >
-        {renderCellContent()}
-        <Pencil className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-50 transition-opacity ml-2 shrink-0" />
-      </div>
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          <div
+            className="group flex items-center justify-between w-full h-full min-h-[2rem] px-2 py-1 rounded-md border border-transparent hover:border-border hover:bg-muted/50 cursor-pointer transition-all"
+            onDoubleClick={() => setOpen(true)}
+            title="Düzenlemek için çift tıklayın, diğer işlemler için sağ tıklayın"
+          >
+            {renderCellContent()}
+            <Pencil className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-50 transition-opacity ml-2 shrink-0" />
+          </div>
+        </ContextMenuTrigger>
+        <ContextMenuContent className="w-64">
+           <ContextMenuItem inset onClick={() => setOpen(true)}>
+             Hücreyi Düzenle
+             <ContextMenuShortcut>DblClick</ContextMenuShortcut>
+           </ContextMenuItem>
+           <ContextMenuItem inset onClick={() => tableMeta?.onEditRow?.(rowIndex, rowData)}>
+             Satırı Düzenle
+             <ContextMenuShortcut>Ctrl+E</ContextMenuShortcut>
+           </ContextMenuItem>
+           <ContextMenuSeparator />
+           <ContextMenuItem inset onClick={() => tableMeta?.onInsertRow?.(rowIndex)}>
+             Satır Ekle (Üste)
+             <ContextMenuShortcut>Ctrl+Ins</ContextMenuShortcut>
+           </ContextMenuItem>
+           <ContextMenuItem inset className="text-destructive focus:text-destructive" onClick={() => tableMeta?.onDeleteRow?.(rowIndex)}>
+             Sil
+             <ContextMenuShortcut>Del</ContextMenuShortcut>
+           </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[500px]">
@@ -190,5 +226,13 @@ function EditableCellComponent({
 
 // Named export olarak dışarı aktar, aynı isimle
 export const EditableCell = memo(EditableCellComponent, (prev, next) => {
-    return prev.getValue() === next.getValue() && prev.rowIndex === next.rowIndex && prev.columnId === next.columnId;
+    // Sadece değer değil, rowData (satır verisi) veya meta fonksiyonları değiştiyse de render etmeli.
+    // Aksi takdirde "Satırı Düzenle" eski veriyi kullanır.
+    if (prev.getValue() !== next.getValue()) return false;
+    if (prev.rowIndex !== next.rowIndex) return false;
+    if (prev.columnId !== next.columnId) return false;
+    if (prev.rowData !== next.rowData) return false; // RowData değiştiyse render et
+    if (prev.tableMeta !== next.tableMeta) return false; // Meta değiştiyse render et
+    
+    return true;
 });
