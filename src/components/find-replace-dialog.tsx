@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Search, Replace } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface FindReplaceDialogProps {
   open: boolean;
@@ -21,6 +22,7 @@ export function FindReplaceDialog({
   headers,
   onFindAndReplace,
 }: FindReplaceDialogProps) {
+  const { t } = useTranslation();
   const [findText, setFindText] = useState("");
   const [replaceText, setReplaceText] = useState("");
   const [targetColumn, setTargetColumn] = useState("all");
@@ -32,10 +34,10 @@ export function FindReplaceDialog({
     const count = onFindAndReplace(findText, replaceText, targetColumn, caseSensitive);
     
     if (count > 0) {
-      toast.success(`${count} adet kayıt güncellendi.`);
+      toast.success(t('find_replace.success_msg', { count }));
       onOpenChange(false);
     } else {
-      toast.info("Değiştirilecek kayıt bulunamadı.");
+      toast.info(t('find_replace.not_found'));
     }
   };
 
@@ -49,16 +51,16 @@ export function FindReplaceDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Search className="w-5 h-5" />
-            Bul ve Değiştir
+            {t('find_replace.title')}
           </DialogTitle>
           <DialogDescription>
-            Veri seti içinde metin arayın ve toplu olarak değiştirin.
+            {t('find_replace.desc')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="find">Aranan Metin</Label>
+            <Label htmlFor="find">{t('find_replace.find_label')}</Label>
             <Input
               id="find"
               value={findText}
@@ -69,7 +71,7 @@ export function FindReplaceDialog({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="replace">Yeni Değer</Label>
+            <Label htmlFor="replace">{t('find_replace.replace_label')}</Label>
             <Input
               id="replace"
               value={replaceText}
@@ -79,13 +81,13 @@ export function FindReplaceDialog({
           </div>
 
           <div className="grid gap-2">
-            <Label>Hedef Sütun</Label>
+            <Label>{t('find_replace.target_column')}</Label>
             <Select value={targetColumn} onValueChange={setTargetColumn}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Sütun Seçin" />
+                <SelectValue placeholder={t('find_replace.target_column')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tüm Sütunlar</SelectItem>
+                <SelectItem value="all">{t('find_replace.all_columns')}</SelectItem>
                 {headers.map((header) => (
                   <SelectItem key={header} value={header}>
                     {header}
@@ -102,18 +104,18 @@ export function FindReplaceDialog({
                 onCheckedChange={(checked) => setCaseSensitive(checked as boolean)}
             />
             <Label htmlFor="caseSensitive" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Büyük/Küçük harf duyarlı
+              {t('find_replace.case_sensitive')}
             </Label>
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            İptal
+            {t('find_replace.cancel')}
           </Button>
           <Button onClick={handleReplace} disabled={!findText}>
             <Replace className="w-4 h-4 mr-2" />
-            Tümünü Değiştir
+            {t('find_replace.replace_all')}
           </Button>
         </DialogFooter>
       </DialogContent>

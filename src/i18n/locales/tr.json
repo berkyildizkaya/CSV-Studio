@@ -1,0 +1,47 @@
+{
+  "app": {
+    "title": "CSV Studio",
+    "subtitle": "Hızlı ve güvenli CSV düzenleyici",
+    "open_file": "CSV Dosyası Aç",
+    "open_different_file": "Farklı Dosya Aç",
+    "select_file_desc": "Düzenlemek için bir CSV dosyası seçin",
+    "loading": "Yükleniyor...",
+    "rows": "satır",
+    "find_replace": "Bul ve Değiştir",
+    "save": "Kaydet",
+    "save_as": "Farklı Kaydet...",
+    "export": "Dışa Aktar"
+  },
+  "table": {
+    "select_all": "Tümünü Seç",
+    "search_placeholder": "Ara...",
+    "delete_selected": "Seçilenleri Sil",
+    "delete_confirm": "{{count}} adet satırı silmek istediğinize emin misiniz?",
+    "no_results": "Sonuç bulunamadı.",
+    "add_row": "Satır Ekle",
+    "edit_row": "Satırı Düzenle"
+  },
+  "find_replace": {
+    "title": "Bul ve Değiştir",
+    "desc": "Veri seti içinde metin arayın ve toplu olarak değiştirin.",
+    "find_label": "Aranan Metin",
+    "replace_label": "Yeni Değer",
+    "target_column": "Hedef Sütun",
+    "all_columns": "Tüm Sütunlar",
+    "case_sensitive": "Büyük/Küçük harf duyarlı",
+    "replace_all": "Tümünü Değiştir",
+    "cancel": "İptal",
+    "success_msg": "{{count}} adet kayıt güncellendi.",
+    "not_found": "Değiştirilecek kayıt bulunamadı."
+  },
+  "toast": {
+    "file_loaded": "Dosya başarıyla yüklendi",
+    "file_saved": "Dosya başarıyla kaydedildi",
+    "saving": "Dosya kaydediliyor...",
+    "save_error": "Kaydetme hatası",
+    "load_error": "Dosya okuma hatası",
+    "parse_error": "CSV Parse Hatası",
+    "no_data_to_save": "Kaydedilecek veri bulunamadı.",
+    "save_cancelled": "Kaydetme iptal edildi."
+  }
+}

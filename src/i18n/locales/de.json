@@ -1,0 +1,47 @@
+{
+  "app": {
+    "title": "CSV Studio",
+    "subtitle": "Schneller und sicherer CSV-Editor",
+    "open_file": "CSV-Datei öffnen",
+    "open_different_file": "Andere Datei öffnen",
+    "select_file_desc": "Wählen Sie eine CSV-Datei zum Bearbeiten aus",
+    "loading": "Laden...",
+    "rows": "Zeilen",
+    "find_replace": "Suchen & Ersetzen",
+    "save": "Speichern",
+    "save_as": "Speichern unter...",
+    "export": "Exportieren"
+  },
+  "table": {
+    "select_all": "Alle auswählen",
+    "search_placeholder": "Suchen...",
+    "delete_selected": "Ausgewählte löschen",
+    "delete_confirm": "Sind Sie sicher, dass Sie {{count}} Zeilen löschen möchten?",
+    "no_results": "Keine Ergebnisse gefunden.",
+    "add_row": "Zeile hinzufügen",
+    "edit_row": "Zeile bearbeiten"
+  },
+  "find_replace": {
+    "title": "Suchen & Ersetzen",
+    "desc": "Suchen Sie nach Text im Datensatz und ersetzen Sie ihn in Massen.",
+    "find_label": "Text suchen",
+    "replace_label": "Ersetzen durch",
+    "target_column": "Zielspalte",
+    "all_columns": "Alle Spalten",
+    "case_sensitive": "Groß-/Kleinschreibung beachten",
+    "replace_all": "Alle ersetzen",
+    "cancel": "Abbrechen",
+    "success_msg": "{{count}} Datensätze aktualisiert.",
+    "not_found": "Keine Datensätze zum Ersetzen gefunden."
+  },
+  "toast": {
+    "file_loaded": "Datei erfolgreich geladen",
+    "file_saved": "Datei erfolgreich gespeichert",
+    "saving": "Datei wird gespeichert...",
+    "save_error": "Fehler beim Speichern",
+    "load_error": "Fehler beim Lesen der Datei",
+    "parse_error": "CSV-Parse-Fehler",
+    "no_data_to_save": "Keine Daten zum Speichern gefunden.",
+    "save_cancelled": "Speichern abgebrochen."
+  }
+}

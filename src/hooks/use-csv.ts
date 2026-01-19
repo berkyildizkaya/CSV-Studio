@@ -3,6 +3,7 @@ import { open, save } from "@tauri-apps/plugin-dialog";
 import Papa from "papaparse";
 import { readAndDecodeFile, saveFileContent } from "@/lib/file-utils";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface CsvState {
   data: any[];
@@ -14,6 +15,7 @@ interface CsvState {
 }
 
 export function useCsv() {
+  const { t } = useTranslation();
   const [state, setState] = useState<CsvState>({
     data: [],
     headers: [],
@@ -86,12 +88,12 @@ export function useCsv() {
                 isLoading: false,
                 error: null,
             });
-            toast.success("Dosya başarıyla yüklendi", {
-              description: `${filePath.split(/[\\/]/).pop()} (${data.length} satır)`,
+            toast.success(t('toast.file_loaded'), {
+              description: `${filePath.split(/[\\/]/).pop()} (${data.length} ${t('app.rows')})`,
             });
         },
         error: (error: Error) => {
-            const errorMsg = `CSV Parse Hatası: ${error.message}`;
+            const errorMsg = `${t('toast.parse_error')}: ${error.message}`;
             setState((prev) => ({
                 ...prev,
                 isLoading: false,
@@ -102,7 +104,7 @@ export function useCsv() {
       });
     } catch (err: any) {
       console.error("CSV Yükleme Hatası:", err);
-      const errorMsg = `Dosya okuma hatası: ${err.message || err}`;
+      const errorMsg = `${t('toast.load_error')}: ${err.message || err}`;
       setState((prev) => ({
         ...prev,
         isLoading: false,
@@ -114,7 +116,7 @@ export function useCsv() {
 
   const saveCsvFile = async (saveAs: boolean = false) => {
     if (!state.data || state.data.length === 0) {
-      toast.error("Kaydedilecek veri bulunamadı.");
+      toast.error(t('toast.no_data_to_save'));
       return;
     }
 
@@ -125,7 +127,7 @@ export function useCsv() {
       if (saveAs || !filePath) {
         console.log("Opening save dialog...");
         const selectedPath = await save({
-          title: saveAs ? "Farklı Kaydet" : "Dosyayı Kaydet",
+          title: saveAs ? t('app.save_as') : t('app.save'),
           filters: [{ name: "CSV Dosyası", extensions: ["csv"] }],
           defaultPath: filePath || "data.csv",
         });
@@ -137,7 +139,7 @@ export function useCsv() {
         filePath = selectedPath;
       }
 
-      const toastId = toast.loading("Dosya kaydediliyor...");
+      const toastId = toast.loading(t('toast.saving'));
 
       // Datayı CSV formatına çevir
       const csvContent = Papa.unparse(state.data, {
@@ -150,17 +152,17 @@ export function useCsv() {
 
       setState((prev) => ({ ...prev, fileName: filePath }));
       
-      toast.success("Dosya başarıyla kaydedildi", {
+      toast.success(t('toast.file_saved'), {
         id: toastId,
         description: filePath.split(/[\\/]/).pop(),
       });
 
     } catch (err: any) {
       console.error("CSV Kaydetme Hatası:", err);
-      toast.error(`Kaydetme hatası: ${err.message || err}`);
+      toast.error(`${t('toast.save_error')}: ${err.message || err}`);
       setState((prev) => ({
         ...prev,
-        error: `Kaydetme hatası: ${err.message || err}`,
+        error: `${t('toast.save_error')}: ${err.message || err}`,
       }));
     }
   };

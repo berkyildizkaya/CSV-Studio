@@ -1,0 +1,47 @@
+{
+  "app": {
+    "title": "CSV Studio",
+    "subtitle": "Fast and secure CSV editor",
+    "open_file": "Open CSV File",
+    "open_different_file": "Open Different File",
+    "select_file_desc": "Select a CSV file to edit",
+    "loading": "Loading...",
+    "rows": "rows",
+    "find_replace": "Find & Replace",
+    "save": "Save",
+    "save_as": "Save As...",
+    "export": "Export"
+  },
+  "table": {
+    "select_all": "Select All",
+    "search_placeholder": "Search...",
+    "delete_selected": "Delete Selected",
+    "delete_confirm": "Are you sure you want to delete {{count}} rows?",
+    "no_results": "No results found.",
+    "add_row": "Add Row",
+    "edit_row": "Edit Row"
+  },
+  "find_replace": {
+    "title": "Find & Replace",
+    "desc": "Search for text within the dataset and replace it in bulk.",
+    "find_label": "Find Text",
+    "replace_label": "Replace With",
+    "target_column": "Target Column",
+    "all_columns": "All Columns",
+    "case_sensitive": "Case Sensitive",
+    "replace_all": "Replace All",
+    "cancel": "Cancel",
+    "success_msg": "{{count}} records updated.",
+    "not_found": "No records found to replace."
+  },
+  "toast": {
+    "file_loaded": "File loaded successfully",
+    "file_saved": "File saved successfully",
+    "saving": "Saving file...",
+    "save_error": "Save error",
+    "load_error": "File read error",
+    "parse_error": "CSV Parse Error",
+    "no_data_to_save": "No data found to save.",
+    "save_cancelled": "Save cancelled."
+  }
+}

@@ -11,6 +11,7 @@ import {
   RowSelectionState,
 } from "@tanstack/react-table"
 import { useVirtualizer } from "@tanstack/react-virtual"
+import { useTranslation } from "react-i18next";
 
 import {
   TableBody,
@@ -125,6 +126,7 @@ function DataTableInner<TData, TValue>({
   onUpdateRow,
   onDeleteMultiple
 }: DataTableProps<TData, TValue>) {
+  const { t } = useTranslation();
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = React.useState("")
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
@@ -212,7 +214,7 @@ function DataTableInner<TData, TValue>({
   const handleDeleteSelected = () => {
     const selectedIndices = Object.keys(rowSelection).map(Number);
     if (onDeleteMultiple && selectedIndices.length > 0) {
-        if (confirm(`${selectedIndices.length} adet satırı silmek istediğinize emin misiniz?`)) {
+        if (confirm(t('table.delete_confirm', { count: selectedIndices.length }))) {
             onDeleteMultiple(selectedIndices);
             setRowSelection({}); // Seçimi temizle
         }
@@ -237,13 +239,13 @@ function DataTableInner<TData, TValue>({
                 <Checkbox
                     checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
                     onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                    aria-label="Tümünü seç"
+                    aria-label={t('table.select_all')}
                 />
-                <span className="text-sm font-medium">Tümünü Seç</span>
+                <span className="text-sm font-medium">{t('table.select_all')}</span>
             </div>
 
             <input
-            placeholder="Ara..."
+            placeholder={t('table.search_placeholder')}
             value={globalFilter ?? ""}
             onChange={(event) => setGlobalFilter(event.target.value)}
             className="max-w-sm flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
@@ -258,7 +260,7 @@ function DataTableInner<TData, TValue>({
                 className="animate-in fade-in zoom-in duration-200"
             >
                 <Trash2 className="w-4 h-4 mr-2" />
-                Seçilenleri Sil ({Object.keys(rowSelection).length})
+                {t('table.delete_selected')} ({Object.keys(rowSelection).length})
             </Button>
         )}
       </div>
@@ -333,7 +335,7 @@ function DataTableInner<TData, TValue>({
                   colSpan={table.getVisibleLeafColumns().length} 
                   className="h-24 text-center w-full flex items-center justify-center"
                 >
-                  Sonuç bulunamadı.
+                  {t('table.no_results')}
                 </TableCell>
               </TableRow>
             )}
