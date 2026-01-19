@@ -96,20 +96,28 @@ export function useCsv() {
                 error: `CSV Parse Hatası: ${error.message}`,
             }));
         }
-      });
-
-    } catch (err: any) {
-      console.error("CSV Yükleme Hatası:", err);
-      setState((prev) => ({
-        ...prev,
-        isLoading: false,
-        error: `Dosya okuma hatası: ${err.message || err}`,
-      }));
-    }
-  };
-
-  return {
-    ...state,
-    loadCsvFile,
-  };
-}
+            });
+          } catch (err: any) {
+            console.error("CSV Yükleme Hatası:", err);
+            setState((prev) => ({
+              ...prev,
+              isLoading: false,
+              error: `Dosya okuma hatası: ${err.message || err}`,
+            }));
+          }
+        };
+      
+        const updateCell = (rowIndex: number, columnId: string, value: any) => {
+          setState((prev) => {
+            const newData = [...prev.data];
+            newData[rowIndex] = { ...newData[rowIndex], [columnId]: value };
+            return { ...prev, data: newData };
+          });
+        };
+      
+        return {
+          ...state,
+          loadCsvFile,
+          updateCell,
+        };
+      }

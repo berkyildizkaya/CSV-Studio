@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 import { useCsv } from "@/hooks/use-csv";
 import { DataTable } from "@/components/ui/data-table";
+import { EditableCell } from "@/components/editable-cell";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 
 export default function App() {
-  const { fileName, rowCount, headers, data, isLoading, error, loadCsvFile } = useCsv();
+  const { fileName, rowCount, headers, data, isLoading, error, loadCsvFile, updateCell } = useCsv();
 
   // CSV başlıklarından tablo sütunlarını dinamik olarak oluştur
   const columns = useMemo(() => {
@@ -23,10 +24,13 @@ export default function App() {
           </button>
         )
       },
-      cell: ({ row }) => (
-        <div className="truncate text-sm w-full" title={row.getValue(header)}>
-          {row.getValue(header)}
-        </div>
+      cell: ({ row, column, getValue }) => (
+        <EditableCell
+          getValue={getValue}
+          rowIndex={row.index}
+          columnId={column.id}
+          updateData={updateCell}
+        />
       ),
       size: 150, // Varsayılan genişlik
       minSize: 50,

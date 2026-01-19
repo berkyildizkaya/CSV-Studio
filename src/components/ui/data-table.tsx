@@ -7,6 +7,7 @@ import {
   getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
+  Row,
 } from "@tanstack/react-table"
 import { useVirtualizer } from "@tanstack/react-virtual"
 
@@ -52,6 +53,60 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
   }
 }
 
+// Performans için memoize edilmiş Satır Bileşeni
+const DataTableRow = React.memo(({ 
+    row, 
+    virtualRow, 
+    visibleCells,
+    columnSizingInfo // Resize durumunu takip etmek için eklendi
+}: { 
+    row: Row<any>, 
+    virtualRow: any, 
+    visibleCells: any[],
+    columnSizingInfo: any
+}) => {
+    // columnSizingInfo'nun kullanıldığını TS'e bildirmek için (Hata TS6133)
+    // Aslında memo karşılaştırmasında kullanılıyor.
+    void columnSizingInfo;
+
+    return (
+        <TableRow
+            data-state={row.getIsSelected() && "selected"}
+            className="flex hover:bg-muted/50 absolute w-full transition-none border-b items-stretch"
+            style={{
+                transform: `translateY(${virtualRow.start}px)`,
+                height: `${virtualRow.size}px`,
+            }}
+        >
+            {visibleCells.map((cell) => {
+                return (
+                    <TableCell
+                        key={cell.id}
+                        className="p-3 flex items-center border-r overflow-hidden h-full min-h-[45px]"
+                        style={{ width: cell.column.getSize() }}
+                    >
+                        <div className="w-full h-full flex items-center overflow-hidden min-h-[20px]">
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </div>
+                    </TableCell>
+                )
+            })}
+        </TableRow>
+    );
+}, (prevProps, nextProps) => {
+    // Sadece önemli değişikliklerde render et
+    if (prevProps.row !== nextProps.row) return false;
+    if (prevProps.virtualRow.start !== nextProps.virtualRow.start) return false;
+    if (prevProps.visibleCells.length !== nextProps.visibleCells.length) return false;
+    
+    // Resize işlemi devam ediyorsa veya bittiyse render et
+    // columnSizingInfo.isResizingColumn değerine bakıyoruz
+    if (prevProps.columnSizingInfo !== nextProps.columnSizingInfo) return false;
+    
+    return true; 
+});
+
+
 function DataTableInner<TData, TValue>({
   columns,
   data,
@@ -67,6 +122,8 @@ function DataTableInner<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
+    enableColumnResizing: true,
+    columnResizeMode: "onChange",
     state: {
       sorting,
       globalFilter,
@@ -74,8 +131,8 @@ function DataTableInner<TData, TValue>({
   })
 
   const { rows } = table.getRowModel()
-  const visibleColumns = table.getVisibleFlatColumns()
-
+  const columnSizingInfo = table.getState().columnSizingInfo; // Resize bilgisini al
+  
   // Sanallaştırma için container referansı
   const tableContainerRef = React.useRef<HTMLDivElement>(null)
 
@@ -83,7 +140,7 @@ function DataTableInner<TData, TValue>({
     count: rows.length,
     getScrollElement: () => tableContainerRef.current,
     estimateSize: () => 45,
-    overscan: 20, 
+    overscan: 10, 
   })
 
   const { getVirtualItems: getVirtualRows, getTotalSize: getTotalRowHeight } = rowVirtualizer
@@ -91,7 +148,7 @@ function DataTableInner<TData, TValue>({
   const virtualRows = getVirtualRows()
   
   // Tablonun toplam genişliğini hesapla
-  const totalTableWidth = visibleColumns.reduce((acc, col) => acc + col.getSize(), 0)
+  const totalTableWidth = table.getTotalSize()
 
   return (
     <div className="flex flex-col h-full gap-4">
@@ -122,7 +179,7 @@ function DataTableInner<TData, TValue>({
                   return (
                     <TableHead 
                       key={header.id} 
-                      className="h-10 px-3 flex items-center border-r border-b overflow-hidden bg-muted/30"
+                      className="relative h-10 px-3 flex items-center border-r border-b overflow-hidden bg-muted/30 group"
                       style={{ width: header.getSize() }}
                     >
                       {header.isPlaceholder
@@ -131,6 +188,14 @@ function DataTableInner<TData, TValue>({
                             header.column.columnDef.header,
                             header.getContext()
                           )}
+                      {/* Resizer Handle */}
+                      <div
+                        onMouseDown={header.getResizeHandler()}
+                        onTouchStart={header.getResizeHandler()}
+                        className={`absolute right-0 top-0 h-full w-1 cursor-col-resize select-none touch-none hover:bg-primary/50 transition-colors
+                          ${header.column.getIsResizing() ? "bg-primary w-1.5 opacity-100 z-10" : "opacity-0 group-hover:opacity-100 bg-border"}
+                        `}
+                      />
                     </TableHead>
                   )
                 })}
@@ -150,35 +215,19 @@ function DataTableInner<TData, TValue>({
                 const visibleCells = row.getVisibleCells()
 
                 return (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className="flex hover:bg-muted/50 absolute w-full transition-none border-b items-stretch"
-                    style={{
-                      transform: `translateY(${virtualRow.start}px)`,
-                      height: `${virtualRow.size}px`,
-                    }}
-                  >
-                    {visibleCells.map((cell) => {
-                       return (
-                        <TableCell 
-                          key={cell.id} 
-                          className="p-3 flex items-center border-r overflow-hidden h-full min-h-[45px]"
-                          style={{ width: cell.column.getSize() }}
-                        >
-                          <div className="w-full h-full flex items-center overflow-hidden min-h-[20px]">
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </div>
-                        </TableCell>
-                       )
-                    })}
-                  </TableRow>
+                  <DataTableRow 
+                    key={row.id} 
+                    row={row} 
+                    virtualRow={virtualRow} 
+                    visibleCells={visibleCells} 
+                    columnSizingInfo={columnSizingInfo} // Prop olarak geçiliyor
+                  />
                 )
               })
             ) : (
               <TableRow className="flex w-full">
                 <TableCell 
-                  colSpan={visibleColumns.length} 
+                  colSpan={table.getVisibleLeafColumns().length} 
                   className="h-24 text-center w-full flex items-center justify-center"
                 >
                   Sonuç bulunamadı.
