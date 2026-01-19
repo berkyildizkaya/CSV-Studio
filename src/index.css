@@ -120,4 +120,32 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Özel Kaydırma Çubuğu Stilleri */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 14px; /* Yatay çubuğu daha kalın yaptık */
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted/20;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/50 rounded-full border-2 border-transparent bg-clip-padding transition-colors;
+  }
+
+  ::-webkit-scrollbar-thumb:horizontal {
+    @apply bg-primary/60; /* Daha koyu ve belirgin */
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary;
+  }
+
+  /* Firefox için */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.2) transparent;
+  }
 }

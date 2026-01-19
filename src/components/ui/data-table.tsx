@@ -13,7 +13,6 @@ import {
 import { useVirtualizer } from "@tanstack/react-virtual"
 
 import {
-  Table,
   TableBody,
   TableCell,
   TableHead,
@@ -266,13 +265,14 @@ function DataTableInner<TData, TValue>({
       
       <div 
         ref={tableContainerRef}
-        className="rounded-md border flex-1 overflow-auto relative bg-card"
+        className="rounded-md border flex-1 max-w-full overflow-auto relative bg-card custom-scrollbar"
       >
-        <Table 
-          className="relative grid" 
-          style={{ width: totalTableWidth, minWidth: "100%" }}
-        >
-          <TableHeader className="sticky top-0 bg-background z-20 shadow-sm border-b grid w-full">
+        <div style={{ width: totalTableWidth, minWidth: '100%', position: 'relative' }}>
+          <table 
+            className="relative grid w-full caption-bottom text-sm"
+            style={{ width: '100%' }}
+          >
+            <TableHeader className="sticky top-0 bg-background z-30 shadow-md border-b grid w-full">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow 
                 key={headerGroup.id} 
@@ -338,7 +338,8 @@ function DataTableInner<TData, TValue>({
               </TableRow>
             )}
           </TableBody>
-        </Table>
+        </table>
+        </div>
       </div>
     </div>
   )
