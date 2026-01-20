@@ -24,6 +24,7 @@ import { RowFormDialog } from "@/components/add-row-dialog"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Trash2 } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -32,6 +33,9 @@ interface DataTableProps<TData, TValue> {
   onDeleteRow?: (index: number) => void
   onUpdateRow?: (index: number, newData: any) => void
   onDeleteMultiple?: (indices: number[]) => void
+  onDeleteColumn?: (columnId: string) => void // Yeni Prop
+  dirtyCells?: Set<string>
+  newColumns?: Set<string>
 }
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
@@ -62,27 +66,26 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
   }
 }
 
-// Performans için memoize edilmiş Satır Bileşeni (ContextMenu kaldırıldı)
 const DataTableRow = React.memo(({ 
     row, 
     virtualRow, 
     visibleCells,
     columnSizingInfo,
-    isSelected, // Yeni Prop
+    isSelected,
+    tableMeta // Yeni Prop
 }: { 
     row: Row<any>, 
     virtualRow: any, 
     visibleCells: any[],
     columnSizingInfo: any,
-    isSelected: boolean, // Yeni Prop Tipi
+    isSelected: boolean,
+    tableMeta?: any // Yeni Tip
 }) => {
-    // columnSizingInfo'nun kullanıldığını TS'e bildirmek için
     void columnSizingInfo;
-    void row;
 
     return (
       <TableRow
-          data-state={isSelected && "selected"} // row.getIsSelected() yerine prop kullan
+          data-state={isSelected && "selected"}
           className="flex hover:bg-muted/50 absolute w-full transition-none border-b items-stretch group"
           style={{
               transform: `translateY(${virtualRow.start}px)`,
@@ -91,10 +94,26 @@ const DataTableRow = React.memo(({
       >
           {visibleCells.map((cell) => {
               const isSelectColumn = cell.column.id === "select";
+              const columnId = cell.column.id;
+              const rowId = row.original?._uId;
+              
+              // Renklendirme mantığı
+              const isDirty = tableMeta?.dirtyCells?.has(`${rowId}-${columnId}`);
+              const isNewColumn = tableMeta?.newColumns?.has(columnId);
+
               return (
                   <TableCell
                       key={cell.id}
-                      className={`flex items-center border-r overflow-hidden h-full min-h-[45px] ${isSelectColumn ? "p-0" : "p-3"}`}
+                      className={cn(
+                        "flex items-center border-r overflow-hidden h-full min-h-[45px] transition-colors duration-200",
+                        isSelectColumn ? "p-0" : "p-3",
+                        // Değişen hücreler (Soft Yeşil/Turkuaz)
+                        isDirty && "bg-emerald-50/80 dark:bg-emerald-900/20 text-emerald-900 dark:text-emerald-300",
+                        // Yeni sütunlar (Soft Mavi)
+                        isNewColumn && "bg-blue-50/60 dark:bg-blue-900/10 text-blue-900 dark:text-blue-300",
+                        // Her ikisi birden (Daha belirgin yeşil)
+                        isDirty && isNewColumn && "bg-emerald-100/80 dark:bg-emerald-800/30"
+                      )}
                       style={{ width: cell.column.getSize() }}
                   >
                       <div className="w-full h-full flex items-center overflow-hidden min-h-[20px]">
@@ -112,9 +131,11 @@ const DataTableRow = React.memo(({
     if (prevProps.row !== nextProps.row) return false;
     if (prevProps.virtualRow.start !== nextProps.virtualRow.start) return false;
     
-    // Sütun dizilimini kontrol et (Sadece uzunluk yetmez, referans veya içerik değişmiş olabilir)
+    // Dirty veya NewColumn Set referansları değiştiyse render et
+    if (prevProps.tableMeta?.dirtyCells !== nextProps.tableMeta?.dirtyCells) return false;
+    if (prevProps.tableMeta?.newColumns !== nextProps.tableMeta?.newColumns) return false;
+
     if (prevProps.visibleCells !== nextProps.visibleCells) return false;
-    
     if (prevProps.columnSizingInfo !== nextProps.columnSizingInfo) return false;
     
     return true; 
@@ -127,7 +148,10 @@ function DataTableInner<TData, TValue>({
   onInsertRow,
   onDeleteRow,
   onUpdateRow,
-  onDeleteMultiple
+  onDeleteMultiple,
+  onDeleteColumn, // Eksik olan destructuring eklendi
+  dirtyCells,
+  newColumns
 }: DataTableProps<TData, TValue>) {
   const { t } = useTranslation();
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -166,8 +190,11 @@ function DataTableInner<TData, TValue>({
   const tableMeta = React.useMemo(() => ({
     onEditRow: handleOpenEditDialog,
     onInsertRow: handleOpenInsertDialog,
-    onDeleteRow: onDeleteRow
-  }), [handleOpenEditDialog, handleOpenInsertDialog, onDeleteRow]);
+    onDeleteRow: onDeleteRow,
+    onDeleteColumn, // Yeni Eklenen
+    dirtyCells,
+    newColumns
+  }), [handleOpenEditDialog, handleOpenInsertDialog, onDeleteRow, onDeleteColumn, dirtyCells, newColumns]);
 
   const table = useReactTable({
     data,
@@ -296,10 +323,11 @@ function DataTableInner<TData, TValue>({
                 className="flex w-full hover:bg-transparent border-none"
               >
                 {headerGroup.headers.map((header) => {
+                  const isNew = newColumns?.has(header.id);
                   return (
                     <TableHead 
                       key={header.id} 
-                      className="relative h-10 px-3 flex items-center border-r border-b overflow-hidden bg-muted/30 group"
+                      className={`relative h-10 px-3 flex items-center border-r border-b overflow-hidden group transition-colors duration-200 ${isNew ? 'bg-blue-100/60 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' : 'bg-muted/30'}`}
                       style={{ width: header.getSize() }}
                     >
                       {header.isPlaceholder
@@ -340,7 +368,8 @@ function DataTableInner<TData, TValue>({
                     virtualRow={virtualRow} 
                     visibleCells={visibleCells} 
                     columnSizingInfo={columnSizingInfo}
-                    isSelected={row.getIsSelected()} // Prop'u geçir
+                    isSelected={row.getIsSelected()}
+                    tableMeta={tableMeta} // Prop'u geçir
                   />
                 )
               })

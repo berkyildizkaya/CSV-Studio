@@ -180,8 +180,11 @@ function EditableCellComponent({
              <ContextMenuShortcut>Ctrl+Ins</ContextMenuShortcut>
            </ContextMenuItem>
            <ContextMenuItem inset className="text-destructive focus:text-destructive" onClick={() => tableMeta?.onDeleteRow?.(rowIndex)}>
-             Sil
+             Satırı Sil
              <ContextMenuShortcut>Del</ContextMenuShortcut>
+           </ContextMenuItem>
+           <ContextMenuItem inset className="text-destructive focus:text-destructive" onClick={() => tableMeta?.onDeleteColumn?.(columnId)}>
+             Sütunu Sil
            </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>

@@ -32,7 +32,9 @@ export default function App() {
     moveColumn,
     renameColumn,
     addColumn,
-    deleteColumn
+    deleteColumn,
+    dirtyCells,
+    newColumns
   } = useCsv();
 
   const [isFindReplaceOpen, setIsFindReplaceOpen] = useState(false);
@@ -197,6 +199,9 @@ export default function App() {
              onDeleteRow={deleteRow}
              onUpdateRow={updateRow}
              onDeleteMultiple={deleteMultipleRows}
+             onDeleteColumn={deleteColumn}
+             dirtyCells={dirtyCells}
+             newColumns={newColumns}
            />
         </div>
         
