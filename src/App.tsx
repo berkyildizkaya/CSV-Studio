@@ -5,9 +5,10 @@ import { EditableCell } from "@/components/editable-cell";
 import { SelectCell } from "@/components/select-cell";
 import { FindReplaceDialog } from "@/components/find-replace-dialog";
 import { SaveConfigDialog } from "@/components/save-config-dialog";
+import { ColumnManagerDialog } from "@/components/column-manager-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Search, Save, ChevronDown, Languages } from "lucide-react";
+import { ArrowUpDown, Search, Save, ChevronDown, Languages, Columns } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export default function App() {
@@ -27,10 +28,12 @@ export default function App() {
     deleteRow, 
     updateRow, 
     deleteMultipleRows,
-    findAndReplace 
+    findAndReplace,
+    moveColumn
   } = useCsv();
 
   const [isFindReplaceOpen, setIsFindReplaceOpen] = useState(false);
+  const [isColumnManagerOpen, setIsColumnManagerOpen] = useState(false);
   const [isSaveConfigOpen, setIsSaveConfigOpen] = useState(false);
   const [isSaveAs, setIsSaveAs] = useState(false);
 
@@ -144,6 +147,13 @@ export default function App() {
               <Search className="w-4 h-4 mr-2" />
               {t('app.find_replace')}
             </button>
+            <button
+              onClick={() => setIsColumnManagerOpen(true)}
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+            >
+              <Columns className="w-4 h-4 mr-2" />
+              {t('app.manage_columns')}
+            </button>
              <button
               onClick={loadCsvFile}
               className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
@@ -192,6 +202,13 @@ export default function App() {
             onOpenChange={setIsFindReplaceOpen} 
             headers={headers} 
             onFindAndReplace={findAndReplace} 
+        />
+
+        <ColumnManagerDialog
+            open={isColumnManagerOpen}
+            onOpenChange={setIsColumnManagerOpen}
+            headers={headers}
+            onMoveColumn={moveColumn}
         />
 
         <SaveConfigDialog 

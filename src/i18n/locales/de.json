@@ -5,12 +5,13 @@
     "open_file": "CSV-Datei öffnen",
     "open_different_file": "Andere Datei öffnen",
     "select_file_desc": "Wählen Sie eine CSV-Datei zum Bearbeiten aus",
-    "loading": "Laden...",
+    "loading": "Wird geladen...",
     "rows": "Zeilen",
-    "find_replace": "Suchen & Ersetzen",
+    "find_replace": "Suchen und Ersetzen",
     "save": "Speichern",
     "save_as": "Speichern unter...",
-    "export": "Exportieren"
+    "export": "Exportieren",
+    "manage_columns": "Spalten verwalten"
   },
   "table": {
     "select_all": "Alle auswählen",
@@ -22,28 +23,36 @@
     "edit_row": "Zeile bearbeiten"
   },
   "find_replace": {
-    "title": "Suchen & Ersetzen",
-    "desc": "Suchen Sie nach Text im Datensatz und ersetzen Sie ihn in Massen.",
-    "find_label": "Text suchen",
-    "replace_label": "Ersetzen durch",
+    "title": "Suchen und Ersetzen",
+    "desc": "Suchen Sie nach Text im Datensatz und ersetzen Sie ihn massenweise.",
+    "find_label": "Suchtext",
+    "replace_label": "Neuer Wert",
     "target_column": "Zielspalte",
     "all_columns": "Alle Spalten",
     "case_sensitive": "Groß-/Kleinschreibung beachten",
     "replace_all": "Alle ersetzen",
     "cancel": "Abbrechen",
     "success_msg": "{{count}} Datensätze aktualisiert.",
-    "not_found": "Keine Datensätze zum Ersetzen gefunden."
+    "not_found": "Keine zu ersetzenden Datensätze gefunden."
   },
   "save_config": {
-    "desc": "Wählen Sie Dateiformat und Trennzeichen-Optionen.",
-    "delimiter_label": "Spaltentrennzeichen",
+    "desc": "Dateiformat- und Trennzeichenoptionen auswählen.",
+    "delimiter_label": "Spaltentrennzeichen (Delimiter)",
     "excel_compat_label": "Excel-Kompatibilitätsmodus (sep=)",
     "excel_compat_desc": "Fügt am Anfang der Datei eine Zeile hinzu, damit Excel das Trennzeichen erkennt.",
     "continue": "Fortfahren",
     "comma": "Komma ( , )",
     "semicolon": "Semikolon ( ; )",
-    "tab": "Tab ( \\t )",
-    "pipe": "Senkrechter Strich ( | )"
+    "tab": "Tab ( \t )",
+    "pipe": "Pipe ( | )"
+  },
+  "column_manager": {
+    "title": "Spalten verwalten",
+    "desc": "Verwenden Sie die Pfeile, um die Reihenfolge der Spalten zu ändern."
+  },
+  "common": {
+    "done": "Fertig",
+    "cancel": "Abbrechen"
   },
   "toast": {
     "file_loaded": "Datei erfolgreich geladen",

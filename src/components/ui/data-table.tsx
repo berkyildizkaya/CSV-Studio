@@ -111,7 +111,10 @@ const DataTableRow = React.memo(({
 
     if (prevProps.row !== nextProps.row) return false;
     if (prevProps.virtualRow.start !== nextProps.virtualRow.start) return false;
-    if (prevProps.visibleCells.length !== nextProps.visibleCells.length) return false;
+    
+    // Sütun dizilimini kontrol et (Sadece uzunluk yetmez, referans veya içerik değişmiş olabilir)
+    if (prevProps.visibleCells !== nextProps.visibleCells) return false;
+    
     if (prevProps.columnSizingInfo !== nextProps.columnSizingInfo) return false;
     
     return true; 

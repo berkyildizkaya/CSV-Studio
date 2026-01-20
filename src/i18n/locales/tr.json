@@ -10,7 +10,8 @@
     "find_replace": "Bul ve Değiştir",
     "save": "Kaydet",
     "save_as": "Farklı Kaydet...",
-    "export": "Dışa Aktar"
+    "export": "Dışa Aktar",
+    "manage_columns": "Sütunları Yönet"
   },
   "table": {
     "select_all": "Tümünü Seç",
@@ -42,8 +43,16 @@
     "continue": "Devam Et",
     "comma": "Virgül ( , )",
     "semicolon": "Noktalı Virgül ( ; )",
-    "tab": "Tab ( \\t )",
+    "tab": "Tab ( \t )",
     "pipe": "Dik Çizgi ( | )"
+  },
+  "column_manager": {
+    "title": "Sütun Yönetimi",
+    "desc": "Sütunların sırasını değiştirmek için okları kullanın."
+  },
+  "common": {
+    "done": "Tamam",
+    "cancel": "İptal"
   },
   "toast": {
     "file_loaded": "Dosya başarıyla yüklendi",

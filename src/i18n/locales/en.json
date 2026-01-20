@@ -7,10 +7,11 @@
     "select_file_desc": "Select a CSV file to edit",
     "loading": "Loading...",
     "rows": "rows",
-    "find_replace": "Find & Replace",
+    "find_replace": "Find and Replace",
     "save": "Save",
     "save_as": "Save As...",
-    "export": "Export"
+    "export": "Export",
+    "manage_columns": "Manage Columns"
   },
   "table": {
     "select_all": "Select All",
@@ -22,28 +23,36 @@
     "edit_row": "Edit Row"
   },
   "find_replace": {
-    "title": "Find & Replace",
+    "title": "Find and Replace",
     "desc": "Search for text within the dataset and replace it in bulk.",
-    "find_label": "Find Text",
-    "replace_label": "Replace With",
+    "find_label": "Text to Find",
+    "replace_label": "New Value",
     "target_column": "Target Column",
     "all_columns": "All Columns",
     "case_sensitive": "Case Sensitive",
     "replace_all": "Replace All",
     "cancel": "Cancel",
-    "success_msg": "{{count}} records updated.",
+    "success_msg": "Updated {{count}} records.",
     "not_found": "No records found to replace."
   },
   "save_config": {
-    "desc": "Choose file format and delimiter options.",
+    "desc": "Select file format and delimiter options.",
     "delimiter_label": "Column Delimiter",
     "excel_compat_label": "Excel Compatibility Mode (sep=)",
-    "excel_compat_desc": "Adds a line to the top of the file to help Excel recognize the delimiter.",
+    "excel_compat_desc": "Adds a line at the beginning of the file to help Excel recognize the delimiter.",
     "continue": "Continue",
     "comma": "Comma ( , )",
     "semicolon": "Semicolon ( ; )",
-    "tab": "Tab ( \\t )",
+    "tab": "Tab ( \t )",
     "pipe": "Pipe ( | )"
+  },
+  "column_manager": {
+    "title": "Manage Columns",
+    "desc": "Use arrows to change the order of columns."
+  },
+  "common": {
+    "done": "Done",
+    "cancel": "Cancel"
   },
   "toast": {
     "file_loaded": "File loaded successfully",

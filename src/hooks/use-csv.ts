@@ -147,8 +147,11 @@ export function useCsv() {
 
       const toastId = toast.loading(t('toast.saving'));
 
-      // Datayı CSV formatına çevir
-      const csvContent = Papa.unparse(state.data, {
+      // Datayı CSV formatına çevir - Sütun sırasını state.headers'a göre zorla
+      const csvContent = Papa.unparse({
+        fields: state.headers,
+        data: state.data
+      }, {
         quotes: true, // Her hücreyi tırnak içine al (En güvenli yöntem)
         delimiter: targetDelimiter,
         header: true,
@@ -175,7 +178,7 @@ export function useCsv() {
         error: `${t('toast.save_error')}: ${err.message || err}`,
       }));
     }
-  }, [state.data, state.fileName, state.delimiter, t]);
+  }, [state.data, state.fileName, state.delimiter, state.headers, t]);
       
   const updateCell = useCallback((rowIndex: number, columnId: string, value: any) => {
     setState((prev) => {
@@ -270,6 +273,21 @@ export function useCsv() {
     return affectedRows;
   }, []);
 
+  const moveColumn = useCallback((fromIndex: number, toIndex: number) => {
+    setState((prev) => {
+      const newHeaders = [...prev.headers];
+      const [movedColumn] = newHeaders.splice(fromIndex, 1);
+      newHeaders.splice(toIndex, 0, movedColumn);
+      
+      // Veri referansını değiştirerek tablonun sütun değişikliğini fark etmesini garantile
+      return { 
+        ...prev, 
+        headers: newHeaders,
+        data: [...prev.data] 
+      };
+    });
+  }, []);
+
   return {
     ...state,
     loadCsvFile,
@@ -280,5 +298,6 @@ export function useCsv() {
     updateRow,
     deleteMultipleRows,
     findAndReplace,
+    moveColumn,
   };
 }
