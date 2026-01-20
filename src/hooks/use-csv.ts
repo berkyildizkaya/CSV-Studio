@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { open, save } from "@tauri-apps/plugin-dialog";
 import Papa from "papaparse";
 import { readAndDecodeFile, saveFileContent } from "@/lib/file-utils";
@@ -27,7 +27,7 @@ export function useCsv() {
     error: null,
   });
 
-  const loadCsvFile = async () => {
+  const loadCsvFile = useCallback(async () => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
@@ -116,9 +116,9 @@ export function useCsv() {
       }));
       toast.error(errorMsg);
     }
-  };
+  }, [t]);
 
-  const saveCsvFile = async (
+  const saveCsvFile = useCallback(async (
     saveAs: boolean = false, 
     config?: { delimiter: string, includeSep: boolean }
   ) => {
@@ -175,108 +175,110 @@ export function useCsv() {
         error: `${t('toast.save_error')}: ${err.message || err}`,
       }));
     }
-  };
+  }, [state.data, state.fileName, state.delimiter, t]);
       
-          const updateCell = (rowIndex: number, columnId: string, value: any) => {
-            setState((prev) => {
-              const newData = [...prev.data];
-              newData[rowIndex] = { ...newData[rowIndex], [columnId]: value };
-              return { ...prev, data: newData };
-            });
-          };
-        
-            const insertRow = (rowIndex: number, newRowData?: any) => {
-              setState((prev) => {
-                // Eğer veri gelmediyse boş şablon oluştur
-                const rowToAdd = newRowData || prev.headers.reduce((acc, header) => ({ ...acc, [header]: "" }), {});
-                
-                const newData = [...prev.data];
-                // Belirtilen index'in önüne ekle
-                newData.splice(rowIndex, 0, rowToAdd);
-                
-                return { ...prev, data: newData, rowCount: newData.length };
-              });
-            };        
-            const deleteRow = (rowIndex: number) => {
-              setState((prev) => {
-                const newData = [...prev.data];
-                newData.splice(rowIndex, 1);
-                return { ...prev, data: newData, rowCount: newData.length };
-              });
-            };
-          
-              const updateRow = (rowIndex: number, newRowData: any) => {
-                setState((prev) => {
-                  const newData = [...prev.data];
-                  newData[rowIndex] = newRowData;
-                  return { ...prev, data: newData };
-                });
-              };
-            
-                const deleteMultipleRows = (rowIndices: number[]) => {
-                  setState((prev) => {
-                    const indicesToDelete = new Set(rowIndices);
-                    const newData = prev.data.filter((_, index) => !indicesToDelete.has(index));
-                    return { ...prev, data: newData, rowCount: newData.length };
-                  });
-                };
-              
-                const findAndReplace = (
-                  findText: string, 
-                  replaceText: string, 
-                  columnId: string = "all", 
-                  caseSensitive: boolean = false
-                ) => {
-                  let affectedRows = 0;
-                  
-                  setState((prev) => {
-                    const newData = prev.data.map((row) => {
-                      let rowChanged = false;
-                      const newRow = { ...row };
-                      const targetColumns = columnId === "all" ? prev.headers : [columnId];
-              
-                      targetColumns.forEach((col) => {
-                        const originalValue = String(newRow[col] || "");
-                        let newValue = originalValue;
-              
-                        if (caseSensitive) {
-                           if (originalValue.includes(findText)) {
-                               newValue = originalValue.split(findText).join(replaceText);
-                           }
-                        } else {
-                           const regex = new RegExp(findText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-                           if (regex.test(originalValue)) {
-                               newValue = originalValue.replace(regex, replaceText);
-                           }
-                        }
-              
-                        if (newValue !== originalValue) {
-                          newRow[col] = newValue;
-                          rowChanged = true;
-                        }
-                      });
-              
-                      if (rowChanged) {
-                        affectedRows++;
-                        return newRow;
-                      }
-                      return row;
-                    });
-              
-                    return { ...prev, data: newData };
-                  });
-                  
-                  return affectedRows;
-                };
-              
-                  return {
-                    ...state,
-                    loadCsvFile,
-                    saveCsvFile,
-                    updateCell,
-                    insertRow,                  deleteRow,
-                  updateRow,
-                  deleteMultipleRows,
-                  findAndReplace,
-                };
-              }
+  const updateCell = useCallback((rowIndex: number, columnId: string, value: any) => {
+    setState((prev) => {
+      const newData = [...prev.data];
+      newData[rowIndex] = { ...newData[rowIndex], [columnId]: value };
+      return { ...prev, data: newData };
+    });
+  }, []);
+
+  const insertRow = useCallback((rowIndex: number, newRowData?: any) => {
+    setState((prev) => {
+      // Eğer veri gelmediyse boş şablon oluştur
+      const rowToAdd = newRowData || prev.headers.reduce((acc, header) => ({ ...acc, [header]: "" }), {});
+      
+      const newData = [...prev.data];
+      // Belirtilen index'in önüne ekle
+      newData.splice(rowIndex, 0, rowToAdd);
+      
+      return { ...prev, data: newData, rowCount: newData.length };
+    });
+  }, []);
+
+  const deleteRow = useCallback((rowIndex: number) => {
+    setState((prev) => {
+      const newData = [...prev.data];
+      newData.splice(rowIndex, 1);
+      return { ...prev, data: newData, rowCount: newData.length };
+    });
+  }, []);
+
+  const updateRow = useCallback((rowIndex: number, newRowData: any) => {
+    setState((prev) => {
+      const newData = [...prev.data];
+      newData[rowIndex] = newRowData;
+      return { ...prev, data: newData };
+    });
+  }, []);
+
+  const deleteMultipleRows = useCallback((rowIndices: number[]) => {
+    setState((prev) => {
+      const indicesToDelete = new Set(rowIndices);
+      const newData = prev.data.filter((_, index) => !indicesToDelete.has(index));
+      return { ...prev, data: newData, rowCount: newData.length };
+    });
+  }, []);
+
+  const findAndReplace = useCallback((
+    findText: string, 
+    replaceText: string, 
+    columnId: string = "all", 
+    caseSensitive: boolean = false
+  ) => {
+    let affectedRows = 0;
+    
+    setState((prev) => {
+      const newData = prev.data.map((row) => {
+        let rowChanged = false;
+        const newRow = { ...row };
+        const targetColumns = columnId === "all" ? prev.headers : [columnId];
+
+        targetColumns.forEach((col) => {
+          const originalValue = String(newRow[col] || "");
+          let newValue = originalValue;
+
+          if (caseSensitive) {
+             if (originalValue.includes(findText)) {
+                 newValue = originalValue.split(findText).join(replaceText);
+             }
+          } else {
+             const regex = new RegExp(findText.replace(/[.*+?^${}()|[\\]/g, '\\$&'), 'gi');
+             if (regex.test(originalValue)) {
+                 newValue = originalValue.replace(regex, replaceText);
+             }
+          }
+
+          if (newValue !== originalValue) {
+            newRow[col] = newValue;
+            rowChanged = true;
+          }
+        });
+
+        if (rowChanged) {
+          affectedRows++;
+          return newRow;
+        }
+        return row;
+      });
+
+      return { ...prev, data: newData };
+    });
+    
+    return affectedRows;
+  }, []);
+
+  return {
+    ...state,
+    loadCsvFile,
+    saveCsvFile,
+    updateCell,
+    insertRow,
+    deleteRow,
+    updateRow,
+    deleteMultipleRows,
+    findAndReplace,
+  };
+}

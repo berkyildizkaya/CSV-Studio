@@ -129,12 +129,21 @@ function DataTableInner<TData, TValue>({
   const { t } = useTranslation();
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = React.useState("")
+  const [searchValue, setSearchValue] = React.useState("") // Yerel arama değeri
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
   
   // Dialog State
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [targetRowIndex, setTargetRowIndex] = React.useState<number | null>(null);
   const [editingRowData, setEditingRowData] = React.useState<any | null>(null);
+
+  // Arama değerini debounce et
+  React.useEffect(() => {
+    const timeout = setTimeout(() => {
+      setGlobalFilter(searchValue);
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [searchValue]);
 
   // Insert Dialog
   const handleOpenInsertDialog = React.useCallback((index: number) => {
@@ -149,6 +158,13 @@ function DataTableInner<TData, TValue>({
     setEditingRowData(data); // Düzenleme modu
     setIsDialogOpen(true);
   }, []);
+
+  // Meta nesnesini memoize et (Hücrelerin gereksiz re-render olmasını engeller)
+  const tableMeta = React.useMemo(() => ({
+    onEditRow: handleOpenEditDialog,
+    onInsertRow: handleOpenInsertDialog,
+    onDeleteRow: onDeleteRow
+  }), [handleOpenEditDialog, handleOpenInsertDialog, onDeleteRow]);
 
   const table = useReactTable({
     data,
@@ -169,11 +185,7 @@ function DataTableInner<TData, TValue>({
       rowSelection,
     },
     // Meta üzerinden fonksiyonları hücrelere taşıyoruz
-    meta: {
-        onEditRow: handleOpenEditDialog,
-        onInsertRow: handleOpenInsertDialog,
-        onDeleteRow: onDeleteRow
-    }
+    meta: tableMeta
   })
 
   const { rows } = table.getRowModel()
@@ -246,8 +258,8 @@ function DataTableInner<TData, TValue>({
 
             <input
             placeholder={t('table.search_placeholder')}
-            value={globalFilter ?? ""}
-            onChange={(event) => setGlobalFilter(event.target.value)}
+            value={searchValue}
+            onChange={(event) => setSearchValue(event.target.value)}
             className="max-w-sm flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
             />
         </div>
