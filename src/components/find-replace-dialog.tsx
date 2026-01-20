@@ -65,7 +65,7 @@ export function FindReplaceDialog({
               id="find"
               value={findText}
               onChange={(e) => setFindText(e.target.value)}
-              placeholder="Örn: İstanbul"
+              placeholder={t('find_replace.find_placeholder')}
               autoFocus
             />
           </div>
@@ -76,7 +76,7 @@ export function FindReplaceDialog({
               id="replace"
               value={replaceText}
               onChange={(e) => setReplaceText(e.target.value)}
-              placeholder="Örn: İst."
+              placeholder={t('find_replace.replace_placeholder')}
             />
           </div>
 

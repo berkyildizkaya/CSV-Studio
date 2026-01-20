@@ -38,7 +38,7 @@ interface DataTableProps<TData, TValue> {
   newColumns?: Set<string>
 }
 
-class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
+class ErrorBoundary extends React.Component<{ children: React.ReactNode, t: any }, { hasError: boolean, error: any }> {
   constructor(props: any) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -56,7 +56,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
     if (this.state.hasError) {
       return (
         <div className="p-4 border border-destructive/50 bg-destructive/10 text-destructive rounded-md">
-          <h3 className="font-bold">Tablo Görüntüleme Hatası</h3>
+          <h3 className="font-bold">{this.props.t('table.error_title')}</h3>
           <p className="text-sm mt-2 font-mono whitespace-pre-wrap">{this.state.error?.message}</p>
         </div>
       );
@@ -392,8 +392,9 @@ function DataTableInner<TData, TValue>({
 }
 
 export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
+  const { t } = useTranslation();
   return (
-    <ErrorBoundary>
+    <ErrorBoundary t={t}>
       <DataTableInner {...props} />
     </ErrorBoundary>
   )

@@ -1,5 +1,6 @@
 import { memo } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useTranslation } from "react-i18next";
 
 interface SelectCellProps {
   isSelected: boolean;
@@ -7,6 +8,7 @@ interface SelectCellProps {
 }
 
 export const SelectCell = memo(({ isSelected, onToggle }: SelectCellProps) => {
+  const { t } = useTranslation();
   return (
     <div
       className="flex items-center justify-center h-full w-full cursor-pointer hover:bg-muted/80 transition-colors"
@@ -18,7 +20,7 @@ export const SelectCell = memo(({ isSelected, onToggle }: SelectCellProps) => {
       <Checkbox
         checked={isSelected}
         onCheckedChange={() => onToggle()}
-        aria-label="Satırı seç"
+        aria-label={t('table.select_row')}
         className="translate-y-[2px] pointer-events-none"
       />
     </div>

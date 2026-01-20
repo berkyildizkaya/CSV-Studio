@@ -71,7 +71,7 @@ export function ColumnManagerDialog({
   const handleJumpToPosition = (fromIndex: number) => {
     const toPos = parseInt(targetPos);
     if (isNaN(toPos) || toPos < 1 || toPos > headers.length) {
-      toast.error(t('column_manager.invalid_pos', 'Geçersiz sıra numarası.'));
+      toast.error(t('column_manager.invalid_pos'));
       return;
     }
 
@@ -85,7 +85,7 @@ export function ColumnManagerDialog({
       onMoveColumn(fromIndex, toIndex);
       setMovingHeader(null);
       setTargetPos("");
-      toast.success(t('column_manager.move_success', 'Sütun taşındı.'));
+      toast.success(t('column_manager.move_success'));
     });
   };
 

@@ -15,18 +15,22 @@
   },
   "table": {
     "select_all": "Alle auswählen",
-    "search_placeholder": "Suchen...",
+    "select_row": "Zeile auswählen",
+    "search_placeholder": "Suche...",
     "delete_selected": "Ausgewählte löschen",
     "delete_confirm": "Sind Sie sicher, dass Sie {{count}} Zeilen löschen möchten?",
     "no_results": "Keine Ergebnisse gefunden.",
     "add_row": "Zeile hinzufügen",
-    "edit_row": "Zeile bearbeiten"
+    "edit_row": "Zeile bearbeiten",
+    "error_title": "Tabellenanzeigefehler"
   },
   "find_replace": {
     "title": "Suchen und Ersetzen",
-    "desc": "Suchen Sie nach Text im Datensatz und ersetzen Sie ihn massenweise.",
-    "find_label": "Suchtext",
+    "desc": "Suchen Sie nach Text im Datensatz und ersetzen Sie ihn in großen Mengen.",
+    "find_label": "Zu suchender Text",
+    "find_placeholder": "z.B. Berlin",
     "replace_label": "Neuer Wert",
+    "replace_placeholder": "z.B. BE",
     "target_column": "Zielspalte",
     "all_columns": "Alle Spalten",
     "case_sensitive": "Groß-/Kleinschreibung beachten",
@@ -36,16 +40,16 @@
     "not_found": "Keine zu ersetzenden Datensätze gefunden."
   },
   "save_config": {
-    "desc": "Dateiformat- und Trennzeichenoptionen auswählen.",
-    "delimiter_label": "Spaltentrennzeichen (Delimiter)",
+    "desc": "Dateiformat und Trennzeichenoptionen auswählen.",
+    "delimiter_label": "Spaltentrennzeichen",
     "excel_compat_label": "Excel-Kompatibilitätsmodus (sep=)",
     "excel_compat_desc": "Fügt am Anfang der Datei eine Zeile hinzu, damit Excel das Trennzeichen erkennt.",
-    "bom_label": "Globale Kompatibilitätsmarkierung (BOM)",
+    "bom_label": "Globales Kompatibilitätszeichen (BOM)",
     "bom_desc": "Stellt sicher, dass Excel und andere Tools Zeichen und Zahlen korrekt erkennen.",
     "continue": "Fortfahren",
     "comma": "Komma ( , )",
     "semicolon": "Semikolon ( ; )",
-    "tab": "Tab ( \\t )",
+    "tab": "Tabulator ( \t )",
     "pipe": "Pipe ( | )"
   },
   "column_manager": {
@@ -59,24 +63,64 @@
     "rename_success": "Spaltenname aktualisiert",
     "delete_success": "Spalte gelöscht",
     "move_to": "An Position verschieben",
-    "move_placeholder": "Zielrang...",
-    "add_to_start": "Spalte am Anfang hinzufügen"
+    "move_placeholder": "Zielposition...",
+    "add_to_start": "Spalte am Anfang hinzufügen",
+    "invalid_pos": "Ungültige Positionsnummer.",
+    "move_success": "Spalte verschoben."
+  },
+  "row_form": {
+    "add_title": "Neue Zeile hinzufügen",
+    "edit_title": "Zeile bearbeiten",
+    "add_desc": "Geben Sie neue Zeilendaten ein.",
+    "edit_desc": "Vorhandene Zeilendaten aktualisieren.",
+    "columns_count": "{{count}} Spalten.",
+    "page_info": "Seite {{current}} / {{total}}",
+    "back": "Zurück",
+    "next": "Weiter",
+    "save_changes": "Änderungen speichern",
+    "save_and_add": "Speichern und hinzufügen"
+  },
+  "cell": {
+    "edit_title": "Zelle bearbeiten",
+    "edit_desc": "Sie bearbeiten den Wert in der Spalte '{{column}}'.",
+    "detected_type": "Erkannter Datentyp",
+    "value_label": "Wert",
+    "save_shortcut_hint": "Sie können Strg + Eingabe zum Speichern verwenden.",
+    "double_click_hint": "Doppelklick zum Bearbeiten, Rechtsklick für andere Aktionen",
+    "context_edit_cell": "Zelle bearbeiten",
+    "context_edit_row": "Zeile bearbeiten",
+    "context_add_row_above": "Zeile hinzufügen (oberhalb)",
+    "context_delete_row": "Zeile löschen",
+    "context_delete_column": "Spalte löschen",
+    "boolean_true": "Wahr (Aktiv)",
+    "boolean_false": "Falsch (Inaktiv)",
+    "number_edit_hint": "Sie bearbeiten einen numerischen Wert.",
+    "placeholder": "Daten hier eingeben..."
+  },
+  "toast": {
+    "file_loaded": "Datei erfolgreich geladen",
+    "file_saved": "Datei erfolgreich gespeichert",
+    "saving": "Datei wird gespeichert...",
+    "save_error": "Speicherfehler",
+    "load_error": "Dateilesefehler",
+    "parse_error": "CSV-Parsing-Fehler",
+    "no_data_to_save": "Keine Daten zum Speichern gefunden.",
+    "save_cancelled": "Speichern abgebrochen.",
+    "column_exists": "Spalte existiert bereits"
+  },
+  "error": {
+    "path_not_found": "Dateipfad konnte nicht ermittelt werden."
   },
   "common": {
     "done": "Fertig",
     "cancel": "Abbrechen",
     "save": "Speichern",
     "delete": "Löschen",
-    "edit": "Bearbeiten"
-  },
-  "toast": {
-    "file_loaded": "Datei erfolgreich geladen",
-    "file_saved": "Datei erfolgreich gespeichert",
-    "saving": "Datei wird gespeichert...",
-    "save_error": "Fehler beim Speichern",
-    "load_error": "Fehler beim Lesen der Datei",
-    "parse_error": "CSV-Parse-Fehler",
-    "no_data_to_save": "Keine Daten zum Speichern gefunden.",
-    "save_cancelled": "Speichern abgebrochen."
-  }
-}
+    "edit": "Bearbeiten",
+    "true": "Wahr",
+    "false": "Falsch",
+    "csv_files": "CSV-Dateien",
+        "csv_file": "CSV-Datei"
+      }
+    }
+    

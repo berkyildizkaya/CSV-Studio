@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 interface RowFormDialogProps {
   open: boolean;
@@ -46,6 +46,7 @@ function guessColumnType(header: string, data: any[]): 'boolean' | 'date' | 'num
 }
 
 export function RowFormDialog({ open, onOpenChange, headers, sampleData, initialData, onSave }: RowFormDialogProps) {
+  const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(0);
   const [formData, setFormData] = useState<Record<string, any>>({});
 
@@ -96,11 +97,11 @@ export function RowFormDialog({ open, onOpenChange, headers, sampleData, initial
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>
-            {mode === 'edit' ? 'Satırı Düzenle' : 'Yeni Satır Ekle'}
+            {mode === 'edit' ? t('row_form.edit_title') : t('row_form.add_title')}
           </DialogTitle>
           <DialogDescription>
-            {mode === 'edit' ? 'Mevcut satır verilerini güncelleyin.' : 'Yeni satır verilerini girin.'} 
-            {' '}{headers.length} sütun. (Sayfa {currentPage + 1} / {totalPages})
+            {mode === 'edit' ? t('row_form.edit_desc') : t('row_form.add_desc')} 
+            {' '}{t('row_form.columns_count', { count: headers.length })} {t('row_form.page_info', { current: currentPage + 1, total: totalPages })}
           </DialogDescription>
         </DialogHeader>
 
@@ -166,17 +167,17 @@ export function RowFormDialog({ open, onOpenChange, headers, sampleData, initial
             onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
             disabled={currentPage === 0}
           >
-            <ChevronLeft className="w-4 h-4 mr-1" /> Geri
+            <ChevronLeft className="w-4 h-4 mr-1" /> {t('row_form.back')}
           </Button>
 
           <div className="flex gap-2">
             {currentPage < totalPages - 1 ? (
               <Button onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}>
-                İleri <ChevronRight className="w-4 h-4 ml-1" />
+                {t('row_form.next')} <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             ) : (
               <Button onClick={handleSave} className={mode === 'edit' ? "bg-primary" : "bg-green-600 hover:bg-green-700 text-white"}>
-                {mode === 'edit' ? 'Değişiklikleri Kaydet' : 'Kaydet ve Ekle'}
+                {mode === 'edit' ? t('row_form.save_changes') : t('row_form.save_and_add')}
               </Button>
             )}
           </div>

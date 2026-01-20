@@ -23,6 +23,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface EditableCellProps {
   getValue: () => any;
@@ -61,6 +62,7 @@ function EditableCellComponent({
   tableMeta,
   rowData
 }: EditableCellProps) {
+  const { t } = useTranslation();
   const initialValue = getValue();
   const [value, setValue] = useState(initialValue);
   const [open, setOpen] = useState(false);
@@ -117,7 +119,7 @@ function EditableCellComponent({
             onCheckedChange={(checked) => setValue(String(checked))}
           />
           <Label htmlFor="bool-switch" className="font-normal text-base">
-            {isChecked ? "True (Aktif)" : "False (Pasif)"}
+            {isChecked ? t('cell.boolean_true') : t('cell.boolean_false')}
           </Label>
         </div>
       );
@@ -134,7 +136,7 @@ function EditableCellComponent({
                 className="font-mono"
             />
              <p className="text-[0.8rem] text-muted-foreground mt-2">
-                Sayısal değer düzenliyorsunuz.
+                {t('cell.number_edit_hint')}
              </p>
         </>
       );
@@ -147,7 +149,7 @@ function EditableCellComponent({
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
         className="min-h-[150px] font-mono text-sm"
-        placeholder="Buraya veri girin..."
+        placeholder={t('cell.placeholder')}
       />
     );
   };
@@ -159,7 +161,7 @@ function EditableCellComponent({
           <div
             className="group flex items-center justify-between w-full h-full min-h-[2rem] px-2 py-1 rounded-md border border-transparent hover:border-border hover:bg-muted/50 cursor-pointer transition-all"
             onDoubleClick={() => setOpen(true)}
-            title="Düzenlemek için çift tıklayın, diğer işlemler için sağ tıklayın"
+            title={t('cell.double_click_hint')}
           >
             {renderCellContent()}
             <Pencil className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-50 transition-opacity ml-2 shrink-0" />
@@ -167,24 +169,24 @@ function EditableCellComponent({
         </ContextMenuTrigger>
         <ContextMenuContent className="w-64">
            <ContextMenuItem inset onClick={() => setOpen(true)}>
-             Hücreyi Düzenle
+             {t('cell.context_edit_cell')}
              <ContextMenuShortcut>DblClick</ContextMenuShortcut>
            </ContextMenuItem>
            <ContextMenuItem inset onClick={() => tableMeta?.onEditRow?.(rowIndex, rowData)}>
-             Satırı Düzenle
+             {t('cell.context_edit_row')}
              <ContextMenuShortcut>Ctrl+E</ContextMenuShortcut>
            </ContextMenuItem>
            <ContextMenuSeparator />
            <ContextMenuItem inset onClick={() => tableMeta?.onInsertRow?.(rowIndex)}>
-             Satır Ekle (Üste)
+             {t('cell.context_add_row_above')}
              <ContextMenuShortcut>Ctrl+Ins</ContextMenuShortcut>
            </ContextMenuItem>
            <ContextMenuItem inset className="text-destructive focus:text-destructive" onClick={() => tableMeta?.onDeleteRow?.(rowIndex)}>
-             Satırı Sil
+             {t('cell.context_delete_row')}
              <ContextMenuShortcut>Del</ContextMenuShortcut>
            </ContextMenuItem>
            <ContextMenuItem inset className="text-destructive focus:text-destructive" onClick={() => tableMeta?.onDeleteColumn?.(columnId)}>
-             Sütunu Sil
+             {t('cell.context_delete_column')}
            </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
@@ -192,24 +194,24 @@ function EditableCellComponent({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Hücreyi Düzenle</DialogTitle>
+            <DialogTitle>{t('cell.edit_title')}</DialogTitle>
             <DialogDescription>
-              <span className="font-semibold text-primary">{columnId}</span> sütunundaki değeri düzenliyorsunuz.
+              {t('cell.edit_desc', { column: columnId })}
               <br/>
-              <span className="text-xs text-muted-foreground">Algılanan Veri Tipi: <Badge variant="outline" className="text-[10px] h-5">{cellType.toUpperCase()}</Badge></span>
+              <span className="text-xs text-muted-foreground">{t('cell.detected_type')}: <Badge variant="outline" className="text-[10px] h-5">{cellType.toUpperCase()}</Badge></span>
             </DialogDescription>
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               {!['boolean'].includes(cellType) && (
-                  <Label htmlFor="cell-value" className="text-sm font-medium">Değer</Label>
+                  <Label htmlFor="cell-value" className="text-sm font-medium">{t('cell.value_label')}</Label>
               )}
               {renderEditInput()}
               
               {!['boolean'].includes(cellType) && (
                 <p className="text-[0.8rem] text-muted-foreground">
-                    Kaydetmek için <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">Ctrl</kbd> + <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">Enter</kbd> tuşlarını kullanabilirsiniz.
+                    {t('cell.save_shortcut_hint')}
                 </p>
               )}
             </div>
@@ -217,9 +219,9 @@ function EditableCellComponent({
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>
-              İptal
+              {t('common.cancel')}
             </Button>
-            <Button onClick={handleSave}>Kaydet</Button>
+            <Button onClick={handleSave}>{t('common.save')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -38,7 +38,7 @@ export function useCsv() {
     try {
       const selected = await open({
         multiple: false,
-        filters: [{ name: "CSV Dosyaları", extensions: ["csv", "txt"] }],
+        filters: [{ name: t('common.csv_files'), extensions: ["csv", "txt"] }],
       });
 
       if (!selected) {
@@ -47,7 +47,7 @@ export function useCsv() {
       }
 
       let filePath = typeof selected === "string" ? selected : (selected as any).path;
-      if (!filePath) throw new Error("Dosya yolu alınamadı.");
+      if (!filePath) throw new Error(t('error.path_not_found'));
 
       let content = await readAndDecodeFile(filePath);
       let delimiter = "";
@@ -110,7 +110,7 @@ export function useCsv() {
       if (saveAs || !filePath) {
         const selectedPath = await save({
           title: saveAs ? t('app.save_as') : t('app.save'),
-          filters: [{ name: "CSV Dosyası", extensions: ["csv"] }],
+          filters: [{ name: t('common.csv_file'), extensions: ["csv"] }],
           defaultPath: filePath || "data.csv",
         });
         if (!selectedPath) return;

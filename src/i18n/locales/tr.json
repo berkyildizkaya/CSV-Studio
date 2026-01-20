@@ -15,38 +15,42 @@
   },
   "table": {
     "select_all": "Tümünü Seç",
+    "select_row": "Satırı seç",
     "search_placeholder": "Ara...",
     "delete_selected": "Seçilenleri Sil",
-    "delete_confirm": "{{count}} adet satırı silmek istediğinize emin misiniz?",
+    "delete_confirm": "{{count}} satırı silmek istediğinize emin misiniz?",
     "no_results": "Sonuç bulunamadı.",
     "add_row": "Satır Ekle",
-    "edit_row": "Satırı Düzenle"
+    "edit_row": "Satırı Düzenle",
+    "error_title": "Tablo Görüntüleme Hatası"
   },
   "find_replace": {
     "title": "Bul ve Değiştir",
     "desc": "Veri seti içinde metin arayın ve toplu olarak değiştirin.",
-    "find_label": "Aranan Metin",
+    "find_label": "Aranacak Metin",
+    "find_placeholder": "Örn: İstanbul",
     "replace_label": "Yeni Değer",
+    "replace_placeholder": "Örn: İst.",
     "target_column": "Hedef Sütun",
     "all_columns": "Tüm Sütunlar",
-    "case_sensitive": "Büyük/Küçük harf duyarlı",
+    "case_sensitive": "Büyük/Küçük Harf Duyarlı",
     "replace_all": "Tümünü Değiştir",
     "cancel": "İptal",
-    "success_msg": "{{count}} adet kayıt güncellendi.",
+    "success_msg": "{{count}} kayıt güncellendi.",
     "not_found": "Değiştirilecek kayıt bulunamadı."
   },
   "save_config": {
     "desc": "Dosya formatı ve ayırıcı seçeneklerini belirleyin.",
-    "delimiter_label": "Sütun Ayırıcı (Delimiter)",
+    "delimiter_label": "Sütun Ayırıcı",
     "excel_compat_label": "Excel Uyumluluk Modu (sep=)",
-    "excel_compat_desc": "Dosyanın başına Excel'in ayırıcıyı tanımasını sağlayan bir satır ekler.",
-    "bom_label": "Global Uyumluluk İşareti (BOM)",
+    "excel_compat_desc": "Excel'in ayırıcıyı tanıması için dosyanın başına bir satır ekler.",
+    "bom_label": "Evrensel Uyumluluk İşareti (BOM)",
     "bom_desc": "Excel ve diğer araçların karakterleri ve sayıları doğru tanımasını sağlar.",
     "continue": "Devam Et",
     "comma": "Virgül ( , )",
     "semicolon": "Noktalı Virgül ( ; )",
     "tab": "Tab ( \t )",
-    "pipe": "Dik Çizgi ( | )"
+    "pipe": "Düz Çizgi ( | )"
   },
   "column_manager": {
     "title": "Sütun Yönetimi",
@@ -54,20 +58,44 @@
     "add_column": "Yeni Sütun Ekle",
     "column_name_placeholder": "Sütun adı...",
     "rename_title": "Sütunu Yeniden Adlandır",
-    "delete_confirm": "'{{name}}' sütununu ve içindeki tüm verileri silmek istediğinize emin misiniz?",
+    "delete_confirm": "'{{name}}' sütununu ve tüm verilerini silmek istediğinize emin misiniz?",
     "add_success": "Sütun eklendi",
     "rename_success": "Sütun adı güncellendi",
     "delete_success": "Sütun silindi",
     "move_to": "Konuma Taşı",
     "move_placeholder": "Hedef sıra...",
-    "add_to_start": "En başa sütun ekle"
+    "add_to_start": "Başa sütun ekle",
+    "invalid_pos": "Geçersiz sıra numarası.",
+    "move_success": "Sütun taşındı."
   },
-  "common": {
-    "done": "Tamam",
-    "cancel": "İptal",
-    "save": "Kaydet",
-    "delete": "Sil",
-    "edit": "Düzenle"
+  "row_form": {
+    "add_title": "Yeni Satır Ekle",
+    "edit_title": "Satırı Düzenle",
+    "add_desc": "Yeni satır verilerini girin.",
+    "edit_desc": "Mevcut satır verilerini güncelleyin.",
+    "columns_count": "{{count}} sütun.",
+    "page_info": "Sayfa {{current}} / {{total}}",
+    "back": "Geri",
+    "next": "İleri",
+    "save_changes": "Değişiklikleri Kaydet",
+    "save_and_add": "Kaydet ve Ekle"
+  },
+  "cell": {
+    "edit_title": "Hücreyi Düzenle",
+    "edit_desc": "'{{column}}' sütunundaki değeri düzenliyorsunuz.",
+    "detected_type": "Algılanan Veri Tipi",
+    "value_label": "Değer",
+    "save_shortcut_hint": "Kaydetmek için Ctrl + Enter tuşlarını kullanabilirsiniz.",
+    "double_click_hint": "Düzenlemek için çift tıklayın, diğer işlemler için sağ tıklayın",
+    "context_edit_cell": "Hücreyi Düzenle",
+    "context_edit_row": "Satırı Düzenle",
+    "context_add_row_above": "Satır Ekle (Üste)",
+    "context_delete_row": "Satırı Sil",
+    "context_delete_column": "Sütunu Sil",
+    "boolean_true": "True (Aktif)",
+    "boolean_false": "False (Pasif)",
+    "number_edit_hint": "Sayısal değer düzenliyorsunuz.",
+    "placeholder": "Buraya veri girin..."
   },
   "toast": {
     "file_loaded": "Dosya başarıyla yüklendi",
@@ -75,8 +103,23 @@
     "saving": "Dosya kaydediliyor...",
     "save_error": "Kaydetme hatası",
     "load_error": "Dosya okuma hatası",
-    "parse_error": "CSV Parse Hatası",
+    "parse_error": "CSV Ayrıştırma Hatası",
     "no_data_to_save": "Kaydedilecek veri bulunamadı.",
-    "save_cancelled": "Kaydetme iptal edildi."
+    "save_cancelled": "Kaydetme iptal edildi.",
+    "column_exists": "Sütun zaten mevcut"
+  },
+  "error": {
+    "path_not_found": "Dosya yolu alınamadı."
+  },
+  "common": {
+    "done": "Tamam",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "true": "Doğru",
+    "false": "Yanlış",
+    "csv_files": "CSV Dosyaları",
+    "csv_file": "CSV File"
   }
 }

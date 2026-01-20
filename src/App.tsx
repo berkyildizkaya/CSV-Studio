@@ -125,7 +125,7 @@ export default function App() {
                 {fileName?.split(/[\\/]/).pop()}
               </span>
               <span className="mx-2 shrink-0">•</span>
-              <span className="shrink-0">{rowCount.toLocaleString()} {t('app.rows')}</span>
+              <span className="shrink-0">{rowCount.toLocaleString(i18n.language)} {t('app.rows')}</span>
             </div>
           </div>
           

@@ -15,18 +15,22 @@
   },
   "table": {
     "select_all": "Select All",
+    "select_row": "Select row",
     "search_placeholder": "Search...",
     "delete_selected": "Delete Selected",
     "delete_confirm": "Are you sure you want to delete {{count}} rows?",
     "no_results": "No results found.",
     "add_row": "Add Row",
-    "edit_row": "Edit Row"
+    "edit_row": "Edit Row",
+    "error_title": "Table Display Error"
   },
   "find_replace": {
     "title": "Find and Replace",
     "desc": "Search for text within the dataset and replace it in bulk.",
     "find_label": "Text to Find",
+    "find_placeholder": "e.g. New York",
     "replace_label": "New Value",
+    "replace_placeholder": "e.g. NY",
     "target_column": "Target Column",
     "all_columns": "All Columns",
     "case_sensitive": "Case Sensitive",
@@ -45,7 +49,7 @@
     "continue": "Continue",
     "comma": "Comma ( , )",
     "semicolon": "Semicolon ( ; )",
-    "tab": "Tab ( \\t )",
+    "tab": "Tab ( \t )",
     "pipe": "Pipe ( | )"
   },
   "column_manager": {
@@ -60,14 +64,38 @@
     "delete_success": "Column deleted",
     "move_to": "Move to Position",
     "move_placeholder": "Target rank...",
-    "add_to_start": "Add column to start"
+    "add_to_start": "Add column to start",
+    "invalid_pos": "Invalid position number.",
+    "move_success": "Column moved."
   },
-  "common": {
-    "done": "Done",
-    "cancel": "Cancel",
-    "save": "Save",
-    "delete": "Delete",
-    "edit": "Edit"
+  "row_form": {
+    "add_title": "Add New Row",
+    "edit_title": "Edit Row",
+    "add_desc": "Enter new row data.",
+    "edit_desc": "Update existing row data.",
+    "columns_count": "{{count}} columns.",
+    "page_info": "Page {{current}} / {{total}}",
+    "back": "Back",
+    "next": "Next",
+    "save_changes": "Save Changes",
+    "save_and_add": "Save and Add"
+  },
+  "cell": {
+    "edit_title": "Edit Cell",
+    "edit_desc": "You are editing the value in the '{{column}}' column.",
+    "detected_type": "Detected Data Type",
+    "value_label": "Value",
+    "save_shortcut_hint": "You can use Ctrl + Enter to save.",
+    "double_click_hint": "Double click to edit, right click for other actions",
+    "context_edit_cell": "Edit Cell",
+    "context_edit_row": "Edit Row",
+    "context_add_row_above": "Add Row (Above)",
+    "context_delete_row": "Delete Row",
+    "context_delete_column": "Delete Column",
+    "boolean_true": "True (Active)",
+    "boolean_false": "False (Inactive)",
+    "number_edit_hint": "You are editing a numerical value.",
+    "placeholder": "Enter data here..."
   },
   "toast": {
     "file_loaded": "File loaded successfully",
@@ -77,6 +105,21 @@
     "load_error": "File read error",
     "parse_error": "CSV Parse Error",
     "no_data_to_save": "No data found to save.",
-    "save_cancelled": "Save cancelled."
+    "save_cancelled": "Save cancelled.",
+    "column_exists": "Column already exists"
+  },
+  "error": {
+    "path_not_found": "File path could not be obtained."
+  },
+  "common": {
+    "done": "Done",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "true": "True",
+    "false": "False",
+    "csv_files": "CSV Files",
+    "csv_file": "CSV File"
   }
 }
