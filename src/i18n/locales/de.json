@@ -40,19 +40,34 @@
     "delimiter_label": "Spaltentrennzeichen (Delimiter)",
     "excel_compat_label": "Excel-Kompatibilitätsmodus (sep=)",
     "excel_compat_desc": "Fügt am Anfang der Datei eine Zeile hinzu, damit Excel das Trennzeichen erkennt.",
+    "bom_label": "Globale Kompatibilitätsmarkierung (BOM)",
+    "bom_desc": "Stellt sicher, dass Excel und andere Tools Zeichen und Zahlen korrekt erkennen.",
     "continue": "Fortfahren",
     "comma": "Komma ( , )",
     "semicolon": "Semikolon ( ; )",
-    "tab": "Tab ( \t )",
+    "tab": "Tab ( \\t )",
     "pipe": "Pipe ( | )"
   },
   "column_manager": {
-    "title": "Spalten verwalten",
-    "desc": "Verwenden Sie die Pfeile, um die Reihenfolge der Spalten zu ändern."
+    "title": "Spaltenverwaltung",
+    "desc": "Spalten bearbeiten, hinzufügen oder löschen.",
+    "add_column": "Neue Spalte hinzufügen",
+    "column_name_placeholder": "Spaltenname...",
+    "rename_title": "Spalte umbenennen",
+    "delete_confirm": "Sind Sie sicher, dass Sie die Spalte '{{name}}' und alle ihre Daten löschen möchten?",
+    "add_success": "Spalte hinzugefügt",
+    "rename_success": "Spaltenname aktualisiert",
+    "delete_success": "Spalte gelöscht",
+    "move_to": "An Position verschieben",
+    "move_placeholder": "Zielrang...",
+    "add_to_start": "Spalte am Anfang hinzufügen"
   },
   "common": {
     "done": "Fertig",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten"
   },
   "toast": {
     "file_loaded": "Datei erfolgreich geladen",

@@ -40,19 +40,34 @@
     "delimiter_label": "Column Delimiter",
     "excel_compat_label": "Excel Compatibility Mode (sep=)",
     "excel_compat_desc": "Adds a line at the beginning of the file to help Excel recognize the delimiter.",
+    "bom_label": "Global Compatibility Mark (BOM)",
+    "bom_desc": "Ensures Excel and other tools recognize characters and numbers correctly.",
     "continue": "Continue",
     "comma": "Comma ( , )",
     "semicolon": "Semicolon ( ; )",
-    "tab": "Tab ( \t )",
+    "tab": "Tab ( \\t )",
     "pipe": "Pipe ( | )"
   },
   "column_manager": {
-    "title": "Manage Columns",
-    "desc": "Use arrows to change the order of columns."
+    "title": "Column Management",
+    "desc": "Edit, add, or delete columns.",
+    "add_column": "Add New Column",
+    "column_name_placeholder": "Column name...",
+    "rename_title": "Rename Column",
+    "delete_confirm": "Are you sure you want to delete column '{{name}}' and all its data?",
+    "add_success": "Column added",
+    "rename_success": "Column name updated",
+    "delete_success": "Column deleted",
+    "move_to": "Move to Position",
+    "move_placeholder": "Target rank...",
+    "add_to_start": "Add column to start"
   },
   "common": {
     "done": "Done",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit"
   },
   "toast": {
     "file_loaded": "File loaded successfully",

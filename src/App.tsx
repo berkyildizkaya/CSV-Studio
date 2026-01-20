@@ -49,7 +49,7 @@ export default function App() {
     setIsSaveConfigOpen(true);
   };
 
-  const handleSaveConfigConfirm = (config: { delimiter: string, includeSep: boolean }) => {
+  const handleSaveConfigConfirm = (config: { delimiter: string, includeSep: boolean, includeBom: boolean }) => {
     saveCsvFile(isSaveAs, config);
   };
 

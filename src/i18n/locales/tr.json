@@ -40,6 +40,8 @@
     "delimiter_label": "Sütun Ayırıcı (Delimiter)",
     "excel_compat_label": "Excel Uyumluluk Modu (sep=)",
     "excel_compat_desc": "Dosyanın başına Excel'in ayırıcıyı tanımasını sağlayan bir satır ekler.",
+    "bom_label": "Global Uyumluluk İşareti (BOM)",
+    "bom_desc": "Excel ve diğer araçların karakterleri ve sayıları doğru tanımasını sağlar.",
     "continue": "Devam Et",
     "comma": "Virgül ( , )",
     "semicolon": "Noktalı Virgül ( ; )",

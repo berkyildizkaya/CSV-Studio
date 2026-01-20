@@ -1,10 +1,15 @@
-import { readFile, writeTextFile } from "@tauri-apps/plugin-fs";
+import { readFile, writeFile } from "@tauri-apps/plugin-fs";
 
 /**
  * Binary buffer içeriğini analiz ederek doğru encoding ile string'e çevirir.
- * UTF-16LE, UTF-16BE ve UTF-8 (BOM'lu veya BOM'suz) formatlarını destekler.
+ * UTF-8 BOM (0xEF 0xBB 0xBF) varsa onu temizler.
  */
 export function decodeFileContent(buffer: Uint8Array): string {
+  // UTF-8 BOM kontrolü (0xEF 0xBB 0xBF)
+  if (buffer.length >= 3 && buffer[0] === 0xEF && buffer[1] === 0xBB && buffer[2] === 0xBF) {
+    return new TextDecoder("utf-8").decode(buffer.subarray(3));
+  }
+
   // UTF-16 LE BOM kontrolü (0xFF 0xFE)
   if (buffer.length >= 2 && buffer[0] === 0xFF && buffer[1] === 0xFE) {
     return new TextDecoder("utf-16le").decode(buffer.subarray(2));
@@ -39,8 +44,21 @@ export async function readAndDecodeFile(filePath: string): Promise<string> {
 }
 
 /**
- * Belirtilen yola metin içeriğini yazar.
+ * Belirtilen yola metin içeriğini yazar. 
+ * includeBom true ise (varsayılan), Excel uyumluluğu için dosyanın başına UTF-8 BOM ekler.
  */
-export async function saveFileContent(filePath: string, content: string): Promise<void> {
-  await writeTextFile(filePath, content);
+export async function saveFileContent(filePath: string, content: string, includeBom: boolean = true): Promise<void> {
+  const encoder = new TextEncoder();
+  const contentBuffer = encoder.encode(content);
+  
+  if (includeBom) {
+    // UTF-8 BOM: [0xEF, 0xBB, 0xBF]
+    const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+    const finalBuffer = new Uint8Array(bom.length + contentBuffer.length);
+    finalBuffer.set(bom);
+    finalBuffer.set(contentBuffer, bom.length);
+    await writeFile(filePath, finalBuffer);
+  } else {
+    await writeFile(filePath, contentBuffer);
+  }
 }

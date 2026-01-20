@@ -11,7 +11,7 @@ interface SaveConfigDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultDelimiter: string;
-  onConfirm: (config: { delimiter: string, includeSep: boolean }) => void;
+  onConfirm: (config: { delimiter: string, includeSep: boolean, includeBom: boolean }) => void;
 }
 
 export function SaveConfigDialog({
@@ -23,22 +23,24 @@ export function SaveConfigDialog({
   const { t } = useTranslation();
   const [delimiter, setDelimiter] = useState(defaultDelimiter || ",");
   const [includeSep, setIncludeSep] = useState(false);
+  const [includeBom, setIncludeBom] = useState(true);
 
   useEffect(() => {
     if (open) {
       setDelimiter(defaultDelimiter || ",");
       // Eğer virgül değilse genelde Excel için sep= gerekir
       setIncludeSep(defaultDelimiter !== ",");
+      setIncludeBom(true);
     }
   }, [open, defaultDelimiter]);
 
   const handleConfirm = () => {
-    onConfirm({ delimiter, includeSep });
+    onConfirm({ delimiter, includeSep, includeBom });
     onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleConfirm}>
       <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -72,12 +74,28 @@ export function SaveConfigDialog({
                 checked={includeSep}
                 onCheckedChange={(checked) => setIncludeSep(checked as boolean)}
             />
-            <div className="grid gap-1.5 leading-none">
-                <Label htmlFor="includeSep" className="text-sm font-medium leading-none">
+            <div className="grid gap-1.5 leading-none cursor-pointer" onClick={() => setIncludeSep(!includeSep)}>
+                <Label htmlFor="includeSep" className="text-sm font-medium leading-none cursor-pointer">
                     {t('save_config.excel_compat_label')}
                 </Label>
                 <p className="text-xs text-muted-foreground">
                     {t('save_config.excel_compat_desc')}
+                </p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+                id="includeBom" 
+                checked={includeBom}
+                onCheckedChange={(checked) => setIncludeBom(checked as boolean)}
+            />
+            <div className="grid gap-1.5 leading-none cursor-pointer" onClick={() => setIncludeBom(!includeBom)}>
+                <Label htmlFor="includeBom" className="text-sm font-medium leading-none cursor-pointer">
+                    {t('save_config.bom_label')}
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                    {t('save_config.bom_desc')}
                 </p>
             </div>
           </div>

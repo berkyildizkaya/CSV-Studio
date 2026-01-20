@@ -120,7 +120,7 @@ export function useCsv() {
 
   const saveCsvFile = useCallback(async (
     saveAs: boolean = false, 
-    config?: { delimiter: string, includeSep: boolean }
+    config?: { delimiter: string, includeSep: boolean, includeBom: boolean }
   ) => {
     if (!state.data || state.data.length === 0) {
       toast.error(t('toast.no_data_to_save'));
@@ -130,6 +130,7 @@ export function useCsv() {
     try {
       let filePath = state.fileName;
       const targetDelimiter = config?.delimiter || state.delimiter;
+      const includeBom = config?.includeBom ?? true; // Varsayılan true
 
       // Eğer "Farklı Kaydet" isteniyorsa veya henüz bir dosya yolu yoksa
       if (saveAs || !filePath) {
@@ -161,7 +162,7 @@ export function useCsv() {
       const finalContent = config?.includeSep ? `sep=${targetDelimiter}\n${csvContent}` : csvContent;
 
       // Dosyaya yaz
-      await saveFileContent(filePath, finalContent);
+      await saveFileContent(filePath, finalContent, includeBom);
 
       setState((prev) => ({ ...prev, fileName: filePath, delimiter: targetDelimiter }));
       
