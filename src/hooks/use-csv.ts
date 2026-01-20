@@ -288,6 +288,63 @@ export function useCsv() {
     });
   }, []);
 
+  const renameColumn = useCallback((oldName: string, newName: string) => {
+    if (!newName || oldName === newName) return;
+    
+    setState((prev) => {
+      // 1. Headers güncelle
+      const newHeaders = prev.headers.map(h => h === oldName ? newName : h);
+      
+      // 2. Data içindeki tüm objelerin key'lerini güncelle
+      const newData = prev.data.map(row => {
+        const newRow = { ...row };
+        newRow[newName] = newRow[oldName];
+        delete newRow[oldName];
+        return newRow;
+      });
+      
+      return { ...prev, headers: newHeaders, data: newData };
+    });
+  }, []);
+
+  const addColumn = useCallback((columnName: string, index?: number) => {
+    if (!columnName) return;
+    
+    setState((prev) => {
+      if (prev.headers.includes(columnName)) {
+        toast.error(t('toast.column_exists', 'Bu isimde bir sütun zaten var.'));
+        return prev;
+      }
+      
+      const newHeaders = [...prev.headers];
+      if (typeof index === 'number') {
+        newHeaders.splice(index, 0, columnName);
+      } else {
+        newHeaders.push(columnName);
+      }
+
+      const newData = prev.data.map(row => ({
+        ...row,
+        [columnName]: ""
+      }));
+      
+      return { ...prev, headers: newHeaders, data: newData };
+    });
+  }, [t]);
+
+  const deleteColumn = useCallback((columnName: string) => {
+    setState((prev) => {
+      const newHeaders = prev.headers.filter(h => h !== columnName);
+      const newData = prev.data.map(row => {
+        const newRow = { ...row };
+        delete newRow[columnName];
+        return newRow;
+      });
+      
+      return { ...prev, headers: newHeaders, data: newData };
+    });
+  }, []);
+
   return {
     ...state,
     loadCsvFile,
@@ -299,5 +356,8 @@ export function useCsv() {
     deleteMultipleRows,
     findAndReplace,
     moveColumn,
+    renameColumn,
+    addColumn,
+    deleteColumn,
   };
 }

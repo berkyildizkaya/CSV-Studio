@@ -29,7 +29,10 @@ export default function App() {
     updateRow, 
     deleteMultipleRows,
     findAndReplace,
-    moveColumn
+    moveColumn,
+    renameColumn,
+    addColumn,
+    deleteColumn
   } = useCsv();
 
   const [isFindReplaceOpen, setIsFindReplaceOpen] = useState(false);
@@ -209,6 +212,9 @@ export default function App() {
             onOpenChange={setIsColumnManagerOpen}
             headers={headers}
             onMoveColumn={moveColumn}
+            onRenameColumn={renameColumn}
+            onAddColumn={addColumn}
+            onDeleteColumn={deleteColumn}
         />
 
         <SaveConfigDialog 

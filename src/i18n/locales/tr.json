@@ -48,11 +48,24 @@
   },
   "column_manager": {
     "title": "Sütun Yönetimi",
-    "desc": "Sütunların sırasını değiştirmek için okları kullanın."
+    "desc": "Sütunları düzenleyin, ekleyin veya silin.",
+    "add_column": "Yeni Sütun Ekle",
+    "column_name_placeholder": "Sütun adı...",
+    "rename_title": "Sütunu Yeniden Adlandır",
+    "delete_confirm": "'{{name}}' sütununu ve içindeki tüm verileri silmek istediğinize emin misiniz?",
+    "add_success": "Sütun eklendi",
+    "rename_success": "Sütun adı güncellendi",
+    "delete_success": "Sütun silindi",
+    "move_to": "Konuma Taşı",
+    "move_placeholder": "Hedef sıra...",
+    "add_to_start": "En başa sütun ekle"
   },
   "common": {
     "done": "Tamam",
-    "cancel": "İptal"
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "delete": "Sil",
+    "edit": "Düzenle"
   },
   "toast": {
     "file_loaded": "Dosya başarıyla yüklendi",
