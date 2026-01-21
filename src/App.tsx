@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { ColumnDef, Column } from "@tanstack/react-table";
 import { ArrowUpDown, Search, Save, ChevronDown, Languages, Columns } from "lucide-react";
 import { ColumnFilterPopover } from "@/components/column-filter-popover";
+import { multiSelectFilter } from "@/lib/filter-functions";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useTranslation } from "react-i18next";
 
@@ -62,7 +63,7 @@ export default function App() {
     const dynamicColumns = headers.map((header) => ({
       id: header, // Benzersiz ID (accessorKey yerine)
       accessorFn: (row: any) => row[header], // Veriye doğrudan erişim
-      filterFn: 'multiSelect',
+      filterFn: multiSelectFilter,
       header: ({ column }: { column: Column<any> }) => {
         return (
           <div className="flex items-center gap-1 w-full">

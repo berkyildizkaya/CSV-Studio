@@ -26,7 +26,6 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Trash2, X } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { customFilterFns } from "@/lib/filter-functions"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -209,7 +208,6 @@ function DataTableInner<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     onRowSelectionChange: setRowSelection,
     onColumnFiltersChange: setColumnFilters,
-    filterFns: customFilterFns,
     enableColumnResizing: true,
     columnResizeMode: "onChange",
     enableRowSelection: true,
