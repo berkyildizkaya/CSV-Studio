@@ -121,6 +121,14 @@
     @apply bg-background text-foreground;
   }
 
+  /* Tema değişikliğinde transition'ları devre dışı bırak */
+  .no-transitions,
+  .no-transitions *,
+  .no-transitions *::before,
+  .no-transitions *::after {
+    transition: none !important;
+  }
+
   /* Özel Kaydırma Çubuğu Stilleri */
   ::-webkit-scrollbar {
     width: 10px;

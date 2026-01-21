@@ -121,6 +121,12 @@
     "false": "Yanlış",
     "csv_files": "CSV Dosyaları",
     "csv_file": "CSV Dosyası"
+  },
+  "theme": {
+    "toggle": "Tema değiştir",
+    "light": "Açık",
+    "dark": "Koyu",
+    "system": "Sistem"
   }
 }
     

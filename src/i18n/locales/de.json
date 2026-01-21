@@ -120,7 +120,13 @@
     "true": "Wahr",
     "false": "Falsch",
     "csv_files": "CSV-Dateien",
-        "csv_file": "CSV-Datei"
-      }
-    }
+    "csv_file": "CSV-Datei"
+  },
+  "theme": {
+    "toggle": "Thema wechseln",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System"
+  }
+}
     

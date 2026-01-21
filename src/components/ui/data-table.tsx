@@ -105,7 +105,7 @@ const DataTableRow = React.memo(({
                   <TableCell
                       key={cell.id}
                       className={cn(
-                        "flex items-center border-r overflow-hidden h-full min-h-[45px] transition-colors duration-200",
+                        "flex items-center border-r overflow-hidden h-full min-h-[45px]",
                         isSelectColumn ? "p-0" : "p-3",
                         // Değişen hücreler (Soft Yeşil/Turkuaz)
                         isDirty && "bg-emerald-50/80 dark:bg-emerald-900/20 text-emerald-900 dark:text-emerald-300",
@@ -327,7 +327,7 @@ function DataTableInner<TData, TValue>({
                   return (
                     <TableHead 
                       key={header.id} 
-                      className={`relative h-10 px-3 flex items-center border-r border-b overflow-hidden group transition-colors duration-200 ${isNew ? 'bg-blue-100/60 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' : 'bg-muted/30'}`}
+                      className={`relative h-10 px-3 flex items-center border-r border-b overflow-hidden group ${isNew ? 'bg-blue-100/60 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' : 'bg-muted/30'}`}
                       style={{ width: header.getSize() }}
                     >
                       {header.isPlaceholder

@@ -9,6 +9,7 @@ import { ColumnManagerDialog } from "@/components/column-manager-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Search, Save, ChevronDown, Languages, Columns } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { useTranslation } from "react-i18next";
 
 export default function App() {
@@ -130,6 +131,9 @@ export default function App() {
           </div>
           
           <div className="flex items-center gap-2 shrink-0">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* Language Switcher */}
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>

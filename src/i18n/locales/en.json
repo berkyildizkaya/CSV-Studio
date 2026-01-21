@@ -121,5 +121,11 @@
     "false": "False",
     "csv_files": "CSV Files",
     "csv_file": "CSV File"
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
   }
 }
