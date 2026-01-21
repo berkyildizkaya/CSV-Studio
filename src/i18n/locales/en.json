@@ -127,5 +127,19 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+  "filter": {
+    "title": "Filter",
+    "clear": "Clear",
+    "clear_all": "Clear All",
+    "active_count": "{{count}} active filter(s)",
+    "search_placeholder": "Search values...",
+    "select_all": "Select All",
+    "deselect_all": "Deselect All",
+    "showing_top": "Top {{count}} values",
+    "no_values": "No values found",
+    "empty_value": "(Empty)",
+    "selected_count": "{{count}} selected",
+    "apply": "Apply"
   }
 }

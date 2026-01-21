@@ -7,8 +7,9 @@ import { FindReplaceDialog } from "@/components/find-replace-dialog";
 import { SaveConfigDialog } from "@/components/save-config-dialog";
 import { ColumnManagerDialog } from "@/components/column-manager-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, Column } from "@tanstack/react-table";
 import { ArrowUpDown, Search, Save, ChevronDown, Languages, Columns } from "lucide-react";
+import { ColumnFilterPopover } from "@/components/column-filter-popover";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useTranslation } from "react-i18next";
 
@@ -61,15 +62,24 @@ export default function App() {
     const dynamicColumns = headers.map((header) => ({
       id: header, // Benzersiz ID (accessorKey yerine)
       accessorFn: (row: any) => row[header], // Veriye doğrudan erişim
-      header: ({ column }) => {
+      filterFn: 'multiSelect',
+      header: ({ column }: { column: Column<any> }) => {
         return (
-          <button
-            className="flex items-center gap-2 hover:text-primary transition-colors focus:outline-none font-bold text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground w-full"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            <span className="truncate" title={header}>{header}</span>
-            <ArrowUpDown className="ml-1 h-3 w-3 shrink-0" />
-          </button>
+          <div className="flex items-center gap-1 w-full">
+            <button
+              className="flex items-center gap-1 hover:text-primary transition-colors focus:outline-none font-bold text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground flex-1 min-w-0"
+              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+              <span className="truncate" title={header}>{header}</span>
+              <ArrowUpDown className="h-3 w-3 shrink-0" />
+            </button>
+            <ColumnFilterPopover
+              columnId={header}
+              data={data}
+              currentFilter={column.getFilterValue() as string[] | undefined}
+              onFilterChange={(value) => column.setFilterValue(value)}
+            />
+          </div>
         )
       },
       cell: ({ row, column, getValue, table }) => (

@@ -2,6 +2,7 @@ import * as React from "react"
 import {
   ColumnDef,
   SortingState,
+  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -23,8 +24,9 @@ import {
 import { RowFormDialog } from "@/components/add-row-dialog"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Trash2 } from "lucide-react"
+import { Trash2, X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { customFilterFns } from "@/lib/filter-functions"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -158,6 +160,7 @@ function DataTableInner<TData, TValue>({
   const [globalFilter, setGlobalFilter] = React.useState("")
   const [searchValue, setSearchValue] = React.useState("") // Yerel arama değeri
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   
   // Dialog State
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -205,6 +208,8 @@ function DataTableInner<TData, TValue>({
     onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
     onRowSelectionChange: setRowSelection,
+    onColumnFiltersChange: setColumnFilters,
+    filterFns: customFilterFns,
     enableColumnResizing: true,
     columnResizeMode: "onChange",
     enableRowSelection: true,
@@ -213,6 +218,7 @@ function DataTableInner<TData, TValue>({
       sorting,
       globalFilter,
       rowSelection,
+      columnFilters,
     },
     // Meta üzerinden fonksiyonları hücrelere taşıyoruz
     meta: tableMeta
@@ -292,6 +298,23 @@ function DataTableInner<TData, TValue>({
             onChange={(event) => setSearchValue(event.target.value)}
             className="max-w-sm flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
             />
+
+            {columnFilters.length > 0 && (
+              <div className="flex items-center gap-2 px-3 py-2 border rounded-md bg-primary/10 text-primary">
+                <span className="text-sm font-medium">
+                  {t('filter.active_count', { count: columnFilters.length })}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setColumnFilters([])}
+                  className="h-6 px-2 text-xs hover:bg-primary/20"
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  {t('filter.clear_all')}
+                </Button>
+              </div>
+            )}
         </div>
         
         {Object.keys(rowSelection).length > 0 && (

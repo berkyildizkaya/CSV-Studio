@@ -127,6 +127,20 @@
     "light": "Hell",
     "dark": "Dunkel",
     "system": "System"
+  },
+  "filter": {
+    "title": "Filtern",
+    "clear": "Löschen",
+    "clear_all": "Alle löschen",
+    "active_count": "{{count}} aktive(r) Filter",
+    "search_placeholder": "Werte suchen...",
+    "select_all": "Alle auswählen",
+    "deselect_all": "Auswahl aufheben",
+    "showing_top": "Top {{count}} Werte",
+    "no_values": "Keine Werte gefunden",
+    "empty_value": "(Leer)",
+    "selected_count": "{{count}} ausgewählt",
+    "apply": "Anwenden"
   }
 }
     

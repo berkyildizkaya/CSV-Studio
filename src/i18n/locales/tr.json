@@ -127,6 +127,20 @@
     "light": "Açık",
     "dark": "Koyu",
     "system": "Sistem"
+  },
+  "filter": {
+    "title": "Filtrele",
+    "clear": "Temizle",
+    "clear_all": "Tümünü Temizle",
+    "active_count": "{{count}} aktif filtre",
+    "search_placeholder": "Değer ara...",
+    "select_all": "Tümünü Seç",
+    "deselect_all": "Seçimi Kaldır",
+    "showing_top": "İlk {{count}} değer",
+    "no_values": "Değer bulunamadı",
+    "empty_value": "(Boş)",
+    "selected_count": "{{count}} seçili",
+    "apply": "Uygula"
   }
 }
     
