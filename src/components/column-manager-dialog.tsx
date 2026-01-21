@@ -6,7 +6,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   ChevronUp, 
   ChevronDown, 
-  GripVertical, 
   Columns, 
   Loader2, 
   Pencil, 
