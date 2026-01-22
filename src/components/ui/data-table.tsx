@@ -78,7 +78,8 @@ const DataTableRow = React.memo(({
     visibleCells: any[],
     isSelected: boolean,
     tableMeta?: any,
-    virtualRow?: { start: number, size: number }
+    virtualRow?: { start: number, size: number },
+    columnSizing?: any
 }) => {
     const style = virtualRow ? {
         transform: `translateY(${virtualRow.start}px)`,
@@ -126,6 +127,7 @@ const DataTableRow = React.memo(({
     if (prevProps.tableMeta?.dirtyCells !== nextProps.tableMeta?.dirtyCells) return false;
     if (prevProps.tableMeta?.newColumns !== nextProps.tableMeta?.newColumns) return false;
     if (prevProps.visibleCells !== nextProps.visibleCells) return false;
+    if (prevProps.columnSizing !== nextProps.columnSizing) return false;
     return true;
 });
 
@@ -366,6 +368,7 @@ function DataTableInner<TData, TValue>({
                       isSelected={row.getIsSelected()}
                       tableMeta={tableMeta}
                       virtualRow={virtualRow}
+                      columnSizing={table.getState().columnSizing}
                     />
                   )
                 })
@@ -379,6 +382,7 @@ function DataTableInner<TData, TValue>({
                       visibleCells={visibleCells}
                       isSelected={row.getIsSelected()}
                       tableMeta={tableMeta}
+                      columnSizing={table.getState().columnSizing}
                     />
                   )
                 })
