@@ -70,12 +70,18 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode, t: any 
 const DataTableRow = React.memo(({
     row,
     visibleCells,
+    virtualColumns,
+    virtualPaddingLeft,
+    virtualPaddingRight,
     isSelected,
     tableMeta,
     virtualRow
 }: {
     row: Row<any>,
     visibleCells: any[],
+    virtualColumns: any[],
+    virtualPaddingLeft?: number,
+    virtualPaddingRight?: number,
     isSelected: boolean,
     tableMeta?: any,
     virtualRow?: { start: number, size: number },
@@ -92,7 +98,10 @@ const DataTableRow = React.memo(({
           className={`flex hover:bg-muted/50 w-full border-b items-stretch group ${virtualRow ? 'absolute' : ''}`}
           style={style}
       >
-          {visibleCells.map((cell) => {
+          {virtualPaddingLeft ? <div style={{ display: 'flex', width: virtualPaddingLeft }} /> : null}
+          
+          {virtualColumns.map((virtualColumn) => {
+              const cell = visibleCells[virtualColumn.index];
               const isSelectColumn = cell.column.id === "select";
               const columnId = cell.column.id;
               const rowId = row.original?._uId;
@@ -118,6 +127,8 @@ const DataTableRow = React.memo(({
                   </TableCell>
               )
           })}
+
+          {virtualPaddingRight ? <div style={{ display: 'flex', width: virtualPaddingRight }} /> : null}
       </TableRow>
     );
 }, (prevProps, nextProps) => {
@@ -128,11 +139,14 @@ const DataTableRow = React.memo(({
     if (prevProps.tableMeta?.newColumns !== nextProps.tableMeta?.newColumns) return false;
     if (prevProps.visibleCells !== nextProps.visibleCells) return false;
     if (prevProps.columnSizing !== nextProps.columnSizing) return false;
+    // Sanal sütunlar değiştiyse (yatay scroll yapıldıysa) re-render et
+    if (prevProps.virtualColumns !== nextProps.virtualColumns) return false;
+    if (prevProps.virtualPaddingLeft !== nextProps.virtualPaddingLeft) return false;
     return true;
 });
 
 
-function DataTableInner<TData, TValue>({
+const DataTableInner = React.memo(function DataTableInner<TData, TValue>({
   columns,
   data,
   onInsertRow,
@@ -209,22 +223,38 @@ function DataTableInner<TData, TValue>({
   const { rows } = table.getRowModel()
   const tableContainerRef = React.useRef<HTMLDivElement>(null)
 
-  // 500+ satır için virtualization kullan
-  const useVirtual = rows.length > 500
+  // 40+ satır için dikey virtualization kullan
+  const useRowVirtual = rows.length > 40
 
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => tableContainerRef.current,
     estimateSize: () => 45,
-    overscan: 15,
-    enabled: useVirtual,
+    overscan: 40, // Hızlı kaydırmada boşluk görünmemesi için artırıldı
+    enabled: useRowVirtual,
   })
+
+  // Sütun (Yatay) Virtualization
+  const visibleColumns = table.getVisibleLeafColumns();
+  const columnVirtualizer = useVirtualizer({
+    count: visibleColumns.length,
+    getScrollElement: () => tableContainerRef.current,
+    estimateSize: (index) => visibleColumns[index].getSize(),
+    horizontal: true,
+    overscan: 15, // Yatay kaydırma performansı için artırıldı
+    enabled: true 
+  });
+
+  const virtualColumns = columnVirtualizer.getVirtualItems();
+  const virtualPaddingLeft = virtualColumns[0]?.start ?? 0;
+  const virtualPaddingRight = columnVirtualizer.getTotalSize() - (virtualColumns[virtualColumns.length - 1]?.end ?? 0);
 
   const totalTableWidth = table.getTotalSize()
 
   const headers = React.useMemo(() => {
      return columns.map(col => (col as any).accessorKey || col.id || "").filter(Boolean);
   }, [columns]);
+// ... rest of the file ...
 
   const handleSaveRow = (newData: any) => {
     if (targetRowIndex !== null) {
@@ -321,7 +351,10 @@ function DataTableInner<TData, TValue>({
                 key={headerGroup.id}
                 className="flex w-full hover:bg-transparent border-none"
               >
-                {headerGroup.headers.map((header) => {
+                {virtualPaddingLeft ? <div style={{ display: 'flex', width: virtualPaddingLeft }} /> : null}
+
+                {virtualColumns.map((virtualColumn) => {
+                  const header = headerGroup.headers[virtualColumn.index];
                   const isNew = newColumns?.has(header.id);
                   return (
                     <TableHead
@@ -345,18 +378,20 @@ function DataTableInner<TData, TValue>({
                     </TableHead>
                   )
                 })}
+
+                {virtualPaddingRight ? <div style={{ display: 'flex', width: virtualPaddingRight }} /> : null}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody
             className="grid w-full"
-            style={useVirtual ? {
+            style={useRowVirtual ? {
               height: `${rowVirtualizer.getTotalSize()}px`,
               position: 'relative',
             } : undefined}
           >
             {rows.length > 0 ? (
-              useVirtual ? (
+              useRowVirtual ? (
                 rowVirtualizer.getVirtualItems().map((virtualRow) => {
                   const row = rows[virtualRow.index]
                   const visibleCells = row.getVisibleCells()
@@ -365,6 +400,9 @@ function DataTableInner<TData, TValue>({
                       key={row.id}
                       row={row}
                       visibleCells={visibleCells}
+                      virtualColumns={virtualColumns}
+                      virtualPaddingLeft={virtualPaddingLeft}
+                      virtualPaddingRight={virtualPaddingRight}
                       isSelected={row.getIsSelected()}
                       tableMeta={tableMeta}
                       virtualRow={virtualRow}
@@ -380,6 +418,9 @@ function DataTableInner<TData, TValue>({
                       key={row.id}
                       row={row}
                       visibleCells={visibleCells}
+                      virtualColumns={virtualColumns}
+                      virtualPaddingLeft={virtualPaddingLeft}
+                      virtualPaddingRight={virtualPaddingRight}
                       isSelected={row.getIsSelected()}
                       tableMeta={tableMeta}
                       columnSizing={table.getState().columnSizing}
@@ -403,7 +444,7 @@ function DataTableInner<TData, TValue>({
       </div>
     </div>
   )
-}
+}) as <TData, TValue>(props: DataTableProps<TData, TValue>) => React.ReactElement;
 
 export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
   const { t } = useTranslation();
