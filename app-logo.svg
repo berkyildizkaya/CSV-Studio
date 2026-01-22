@@ -1,0 +1,42 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-gradient" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="grid-gradient" x1="100" y1="100" x2="412" y2="412" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  
+  <!-- Background Shape (Rounded Rect) -->
+  <rect x="0" y="0" width="512" height="512" rx="110" fill="url(#bg-gradient)"/>
+  
+  <!-- Decorative Header Bar -->
+  <rect x="112" y="120" width="288" height="60" rx="12" fill="#1e293b" stroke="#475569" stroke-width="4"/>
+  <circle cx="142" cy="150" r="8" fill="#ef4444"/>
+  <circle cx="170" cy="150" r="8" fill="#eab308"/>
+  <circle cx="198" cy="150" r="8" fill="#22c55e"/>
+
+  <!-- Main Grid Container -->
+  <rect x="112" y="200" width="288" height="200" rx="12" fill="#1e293b" stroke="#475569" stroke-width="4"/>
+
+  <!-- Grid Lines / Cells -->
+  <!-- Row 1 -->
+  <rect x="132" y="220" width="70" height="40" rx="6" fill="#334155"/>
+  <rect x="222" y="220" width="158" height="40" rx="6" fill="url(#grid-gradient)"/>
+  
+  <!-- Row 2 -->
+  <rect x="132" y="280" width="70" height="40" rx="6" fill="#334155"/>
+  <rect x="222" y="280" width="158" height="40" rx="6" fill="#334155"/>
+  
+  <!-- Row 3 -->
+  <rect x="132" y="340" width="70" height="40" rx="6" fill="#334155"/>
+  <rect x="222" y="340" width="70" height="40" rx="6" fill="#334155"/>
+  <rect x="310" y="340" width="70" height="40" rx="6" fill="#334155"/>
+
+</svg>

@@ -1,7 +1,8 @@
 {
-  "name": "csv-studio-app",
-  "private": true,
-  "version": "0.1.0",
+  "name": "csv-studio",
+  "version": "1.0.0",
+  "author": "Berk YILDIZKAYA",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",

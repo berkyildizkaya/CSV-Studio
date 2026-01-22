@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "csv-studio-app",
-  "version": "0.1.0",
-  "identifier": "com.yildizkaya.csv-studio-app",
+  "productName": "CSV Studio",
+  "version": "1.0.0",
+  "identifier": "com.yildizkaya.csv-studio",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "csv-studio-app",
+        "title": "CSV Studio",
         "width": 800,
         "height": 600
       }
@@ -24,6 +24,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "publisher": "Berk YILDIZKAYA",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
