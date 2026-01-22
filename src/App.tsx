@@ -27,7 +27,6 @@ export default function App() {
     error, 
     loadCsvFile, 
     saveCsvFile,
-    updateCell, 
     insertRow, 
     deleteRow, 
     updateRow, 
