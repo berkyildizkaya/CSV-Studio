@@ -24,8 +24,49 @@ import {
 import { RowFormDialog } from "@/components/add-row-dialog"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Trash2, X } from "lucide-react"
+import { Trash2, X, Pencil } from "lucide-react"
 import { cn } from "@/lib/utils"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
+import { Badge } from "@/components/ui/badge"
+
+// Değerin tipini tahmin eden yardımcı fonksiyon (Hafif versiyon)
+function detectType(value: any): 'boolean' | 'number' | 'text' {
+  if (value === null || value === undefined) return 'text';
+  const strVal = String(value).trim();
+  const lowerVal = strVal.toLowerCase();
+  if (lowerVal === 'true' || lowerVal === 'false') return 'boolean';
+  if (!isNaN(Number(strVal)) && strVal !== '' && !(strVal.startsWith('0') && strVal.length > 1 && !strVal.startsWith('0.'))) {
+    return 'number';
+  }
+  return 'text';
+}
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -168,6 +209,14 @@ const DataTableInner = React.memo(function DataTableInner<TData, TValue>({
   const [targetRowIndex, setTargetRowIndex] = React.useState<number | null>(null);
   const [editingRowData, setEditingRowData] = React.useState<any | null>(null);
 
+  // Hücre düzenleme state'leri
+  const [isCellDialogOpen, setIsCellDialogOpen] = React.useState(false);
+  const [editingCellInfo, setEditingCellInfo] = React.useState<{ rowIndex: number, columnId: string, value: any } | null>(null);
+  const [cellValue, setCellValue] = React.useState<any>("");
+
+  // Context Menu state'i
+  const [contextMenuInfo, setContextMenuInfo] = React.useState<{ x: number, y: number, rowIndex: number, columnId: string, value: any, rowData: any } | null>(null);
+
   // Arama değerini debounce et
   React.useEffect(() => {
     const timeout = setTimeout(() => {
@@ -188,14 +237,27 @@ const DataTableInner = React.memo(function DataTableInner<TData, TValue>({
     setIsDialogOpen(true);
   }, []);
 
+  const handleOpenCellDialog = React.useCallback((value: any, columnId: string, rowIndex: number) => {
+    setEditingCellInfo({ rowIndex, columnId, value });
+    setCellValue(value);
+    setIsCellDialogOpen(true);
+  }, []);
+
+  const handleCellContextMenu = React.useCallback((e: React.MouseEvent, value: any, columnId: string, rowIndex: number, rowData: any) => {
+    e.preventDefault();
+    setContextMenuInfo({ x: e.clientX, y: e.clientY, rowIndex, columnId, value, rowData });
+  }, []);
+
   const tableMeta = React.useMemo(() => ({
     onEditRow: handleOpenEditDialog,
     onInsertRow: handleOpenInsertDialog,
     onDeleteRow: onDeleteRow,
     onDeleteColumn,
+    onEditCell: handleOpenCellDialog,
+    onCellContextMenu: handleCellContextMenu,
     dirtyCells,
     newColumns
-  }), [handleOpenEditDialog, handleOpenInsertDialog, onDeleteRow, onDeleteColumn, dirtyCells, newColumns]);
+  }), [handleOpenEditDialog, handleOpenInsertDialog, onDeleteRow, onDeleteColumn, handleOpenCellDialog, handleCellContextMenu, dirtyCells, newColumns]);
 
   const table = useReactTable({
     data,
@@ -276,6 +338,26 @@ const DataTableInner = React.memo(function DataTableInner<TData, TValue>({
     }
   };
 
+  const cellType = React.useMemo(() => editingCellInfo ? detectType(editingCellInfo.value) : 'text', [editingCellInfo]);
+
+  const handleSaveCell = () => {
+    if (editingCellInfo) {
+      let valToSave = cellValue;
+      if (cellType === 'boolean' && typeof cellValue === 'boolean') {
+          valToSave = String(cellValue);
+      }
+      onUpdateRow?.(editingCellInfo.rowIndex, { ...data[editingCellInfo.rowIndex], [editingCellInfo.columnId]: valToSave });
+      setIsCellDialogOpen(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      handleSaveCell();
+    }
+  };
+
   return (
     <div className="flex flex-col h-full gap-4">
       <RowFormDialog
@@ -286,6 +368,125 @@ const DataTableInner = React.memo(function DataTableInner<TData, TValue>({
         initialData={editingRowData}
         onSave={handleSaveRow}
       />
+
+      {/* Merkezi Hücre Düzenleme Dialogu */}
+      <Dialog open={isCellDialogOpen} onOpenChange={setIsCellDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>{t('cell.edit_title')}</DialogTitle>
+            <DialogDescription>
+              {t('cell.edit_desc', { column: editingCellInfo?.columnId })}
+              <br/>
+              <span className="text-xs text-muted-foreground">{t('cell.detected_type')}: <Badge variant="outline" className="text-[10px] h-5">{cellType.toUpperCase()}</Badge></span>
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              {!['boolean'].includes(cellType) && (
+                  <Label htmlFor="cell-value" className="text-sm font-medium">{t('cell.value_label')}</Label>
+              )}
+              {cellType === 'boolean' ? (
+                 <div className="flex items-center space-x-2 py-4">
+                    <Switch
+                        id="bool-switch"
+                        checked={String(cellValue).toLowerCase() === 'true'}
+                        onCheckedChange={(checked) => setCellValue(String(checked))}
+                    />
+                    <Label htmlFor="bool-switch" className="font-normal text-base">
+                        {String(cellValue).toLowerCase() === 'true' ? t('cell.boolean_true') : t('cell.boolean_false')}
+                    </Label>
+                </div>
+              ) : cellType === 'number' ? (
+                <>
+                    <Input
+                        id="cell-value"
+                        type="number"
+                        value={cellValue}
+                        onChange={(e) => setCellValue(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        className="font-mono"
+                        autoFocus
+                    />
+                     <p className="text-[0.8rem] text-muted-foreground mt-2">
+                        {t('cell.number_edit_hint')}
+                     </p>
+                </>
+              ) : (
+                <Textarea
+                    id="cell-value"
+                    value={cellValue}
+                    onChange={(e) => setCellValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="min-h-[150px] font-mono text-sm"
+                    autoFocus
+                />
+              )}
+              
+              {!['boolean'].includes(cellType) && (
+                <p className="text-[0.8rem] text-muted-foreground">
+                    {t('cell.save_shortcut_hint')}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCellDialogOpen(false)}>{t('common.cancel')}</Button>
+            <Button onClick={handleSaveCell}>{t('common.save')}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Merkezi Context Menu (DropdownMenu olarak simüle edilmiş) */}
+      {contextMenuInfo && (
+          <div 
+            className="fixed z-[9999] pointer-events-none" 
+            style={{ 
+                left: contextMenuInfo.x, 
+                top: contextMenuInfo.y, 
+                position: 'fixed'
+            }}
+          >
+            <DropdownMenu open={!!contextMenuInfo} onOpenChange={(open) => !open && setContextMenuInfo(null)}>
+                <DropdownMenuTrigger className="w-[1px] h-[1px] opacity-0 absolute block pointer-events-none" />
+                <DropdownMenuContent 
+                    className="w-64 pointer-events-auto" 
+                    align="start" 
+                    side="right" // Sağ tık menüsü genelde imlecin sağına açılır
+                    alignOffset={0}
+                    sideOffset={0}
+                    forceMount
+                >
+                    <DropdownMenuItem onClick={() => handleOpenCellDialog(contextMenuInfo.value, contextMenuInfo.columnId, contextMenuInfo.rowIndex)}>
+                        <Pencil className="w-4 h-4 mr-2" />
+                        {t('cell.context_edit_cell')}
+                        <DropdownMenuShortcut>DblClick</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleOpenEditDialog(contextMenuInfo.rowIndex, contextMenuInfo.rowData)}>
+                        {t('cell.context_edit_row')}
+                        <DropdownMenuShortcut>Ctrl+E</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleOpenInsertDialog(contextMenuInfo.rowIndex)}>
+                        {t('cell.context_add_row_above')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => {
+                        onDeleteRow?.(contextMenuInfo.rowIndex);
+                        setContextMenuInfo(null);
+                    }}>
+                        {t('cell.context_delete_row')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => {
+                        onDeleteColumn?.(contextMenuInfo.columnId);
+                        setContextMenuInfo(null);
+                    }}>
+                        {t('cell.context_delete_column')}
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+      )}
 
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 flex-1">

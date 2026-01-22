@@ -1,41 +1,18 @@
-import { useState, useEffect, useMemo, memo } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuShortcut,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
+import { memo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useTranslation } from "react-i18next";
 
 interface EditableCellProps {
-  getValue: () => any;
-  rowIndex: number;
+  value: any;
   columnId: string;
-  updateData: (rowIndex: number, columnId: string, value: any) => void;
-  // Table meta verisine erişim için
-  tableMeta?: any; 
-  rowData?: any;
+  isDirty?: boolean;
+  isNewColumn?: boolean;
+  onEditClick: (value: any, columnId: string) => void;
+  onContextMenu: (e: React.MouseEvent, value: any, columnId: string) => void;
 }
 
-// Değerin tipini tahmin eden yardımcı fonksiyon
+// Değerin tipini tahmin eden yardımcı fonksiyon (Hafif versiyon)
 function detectType(value: any): 'boolean' | 'number' | 'text' {
   if (value === null || value === undefined) return 'text';
   
@@ -55,189 +32,54 @@ function detectType(value: any): 'boolean' | 'number' | 'text' {
 }
 
 function EditableCellComponent({
-  getValue,
-  rowIndex,
+  value,
   columnId,
-  updateData,
-  tableMeta,
-  rowData
+  isDirty,
+  isNewColumn,
+  onEditClick,
+  onContextMenu
 }: EditableCellProps) {
-  const { t } = useTranslation();
-  const initialValue = getValue();
-  const [value, setValue] = useState(initialValue);
-  const [open, setOpen] = useState(false);
-  
-  const cellType = useMemo(() => detectType(initialValue), [initialValue]);
-
-  useEffect(() => {
-    if (open) {
-      setValue(initialValue);
-    }
-  }, [open, initialValue]);
-
-  const handleSave = () => {
-    let valueToSave = value;
-    if (cellType === 'boolean' && typeof value === 'boolean') {
-        valueToSave = String(value);
-    }
-    updateData(rowIndex, columnId, valueToSave);
-    setOpen(false);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-      e.preventDefault();
-      handleSave();
-    }
-  };
+  const cellType = detectType(value);
 
   const renderCellContent = () => {
     if (cellType === 'boolean') {
-      const boolVal = String(initialValue).toLowerCase() === 'true';
+      const boolVal = String(value).toLowerCase() === 'true';
       return (
-        <Badge variant={boolVal ? "default" : "secondary"} className={cn("text-xs pointer-events-none", boolVal ? "bg-green-600" : "")}>
+        <Badge variant={boolVal ? "default" : "secondary"} className={cn("text-[10px] px-1 h-4 pointer-events-none", boolVal ? "bg-green-600" : "")}>
           {boolVal ? "TRUE" : "FALSE"}
         </Badge>
       );
     }
     
     if (cellType === 'number') {
-        return <span className="font-mono text-blue-600 dark:text-blue-400 font-medium pointer-events-none">{initialValue}</span>;
+        return <span className="font-mono text-blue-600 dark:text-blue-400 font-medium pointer-events-none truncate">{value}</span>;
     }
 
-    return <span className="truncate block w-full text-sm pointer-events-none">{initialValue}</span>;
-  };
-
-  const renderEditInput = () => {
-    if (cellType === 'boolean') {
-      const isChecked = String(value).toLowerCase() === 'true';
-      return (
-        <div className="flex items-center space-x-2 py-4">
-          <Switch
-            id="bool-switch"
-            checked={isChecked}
-            onCheckedChange={(checked) => setValue(String(checked))}
-          />
-          <Label htmlFor="bool-switch" className="font-normal text-base">
-            {isChecked ? t('cell.boolean_true') : t('cell.boolean_false')}
-          </Label>
-        </div>
-      );
-    }
-
-    if (cellType === 'number') {
-      return (
-        <>
-            <Input
-                type="number"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="font-mono"
-            />
-             <p className="text-[0.8rem] text-muted-foreground mt-2">
-                {t('cell.number_edit_hint')}
-             </p>
-        </>
-      );
-    }
-
-    return (
-      <Textarea
-        id="cell-value"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        className="min-h-[150px] font-mono text-sm"
-        placeholder={t('cell.placeholder')}
-      />
-    );
+    return <span className="truncate block w-full text-sm pointer-events-none">{value}</span>;
   };
 
   return (
-    <>
-      <ContextMenu>
-        <ContextMenuTrigger asChild>
-          <div
-            className="group flex items-center justify-between w-full h-full min-h-[2rem] px-2 py-1 rounded-md border border-transparent hover:border-border hover:bg-muted/50 cursor-pointer transition-all"
-            onDoubleClick={() => setOpen(true)}
-            title={t('cell.double_click_hint')}
-          >
-            {renderCellContent()}
-            <Pencil className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-50 transition-opacity ml-2 shrink-0" />
-          </div>
-        </ContextMenuTrigger>
-        <ContextMenuContent className="w-64">
-           <ContextMenuItem inset onClick={() => setOpen(true)}>
-             {t('cell.context_edit_cell')}
-             <ContextMenuShortcut>DblClick</ContextMenuShortcut>
-           </ContextMenuItem>
-           <ContextMenuItem inset onClick={() => tableMeta?.onEditRow?.(rowIndex, rowData)}>
-             {t('cell.context_edit_row')}
-             <ContextMenuShortcut>Ctrl+E</ContextMenuShortcut>
-           </ContextMenuItem>
-           <ContextMenuSeparator />
-           <ContextMenuItem inset onClick={() => tableMeta?.onInsertRow?.(rowIndex)}>
-             {t('cell.context_add_row_above')}
-             <ContextMenuShortcut>Ctrl+Ins</ContextMenuShortcut>
-           </ContextMenuItem>
-           <ContextMenuItem inset className="text-destructive focus:text-destructive" onClick={() => tableMeta?.onDeleteRow?.(rowIndex)}>
-             {t('cell.context_delete_row')}
-             <ContextMenuShortcut>Del</ContextMenuShortcut>
-           </ContextMenuItem>
-           <ContextMenuItem inset className="text-destructive focus:text-destructive" onClick={() => tableMeta?.onDeleteColumn?.(columnId)}>
-             {t('cell.context_delete_column')}
-           </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>{t('cell.edit_title')}</DialogTitle>
-            <DialogDescription>
-              {t('cell.edit_desc', { column: columnId })}
-              <br/>
-              <span className="text-xs text-muted-foreground">{t('cell.detected_type')}: <Badge variant="outline" className="text-[10px] h-5">{cellType.toUpperCase()}</Badge></span>
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              {!['boolean'].includes(cellType) && (
-                  <Label htmlFor="cell-value" className="text-sm font-medium">{t('cell.value_label')}</Label>
-              )}
-              {renderEditInput()}
-              
-              {!['boolean'].includes(cellType) && (
-                <p className="text-[0.8rem] text-muted-foreground">
-                    {t('cell.save_shortcut_hint')}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>
-              {t('common.cancel')}
-            </Button>
-            <Button onClick={handleSave}>{t('common.save')}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+    <div
+      className={cn(
+        "group flex items-center justify-between w-full h-full min-h-[2rem] px-2 py-1 rounded-sm cursor-pointer transition-colors border border-transparent hover:border-primary/30 hover:bg-primary/5",
+        isDirty && "bg-emerald-50/50 dark:bg-emerald-900/10",
+        isNewColumn && "bg-blue-50/50 dark:bg-blue-900/10"
+      )}
+      onDoubleClick={() => onEditClick(value, columnId)}
+      onContextMenu={(e) => onContextMenu(e, value, columnId)}
+    >
+      <div className="flex-1 overflow-hidden flex items-center">
+        {renderCellContent()}
+      </div>
+      <Pencil className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-40 ml-1 shrink-0" />
+    </div>
   );
 }
 
-// Named export olarak dışarı aktar, aynı isimle
 export const EditableCell = memo(EditableCellComponent, (prev, next) => {
-    // Sadece değer değil, rowData (satır verisi) veya meta fonksiyonları değiştiyse de render etmeli.
-    // Aksi takdirde "Satırı Düzenle" eski veriyi kullanır.
-    if (prev.getValue() !== next.getValue()) return false;
-    if (prev.rowIndex !== next.rowIndex) return false;
-    if (prev.columnId !== next.columnId) return false;
-    if (prev.rowData !== next.rowData) return false; // RowData değiştiyse render et
-    if (prev.tableMeta !== next.tableMeta) return false; // Meta değiştiyse render et
-    
-    return true;
+    return (
+        prev.value === next.value &&
+        prev.isDirty === next.isDirty &&
+        prev.isNewColumn === next.isNewColumn
+    );
 });

@@ -85,16 +85,24 @@ export default function App() {
           </div>
         )
       },
-      cell: ({ row, column, getValue, table }) => (
-        <EditableCell
-          getValue={getValue}
-          rowIndex={row.index}
-          columnId={column.id}
-          updateData={updateCell}
-          tableMeta={table.options.meta}
-          rowData={row.original}
-        />
-      ),
+      cell: ({ row, column, getValue, table }) => {
+        const tableMeta = table.options.meta as any;
+        const columnId = column.id;
+        const rowId = row.original?._uId;
+        const isDirty = tableMeta?.dirtyCells?.has(`${rowId}-${columnId}`);
+        const isNewColumn = tableMeta?.newColumns?.has(columnId);
+
+        return (
+          <EditableCell
+            value={getValue()}
+            columnId={columnId}
+            isDirty={isDirty}
+            isNewColumn={isNewColumn}
+            onEditClick={(val) => tableMeta?.onEditCell?.(val, columnId, row.index)}
+            onContextMenu={(e, val) => tableMeta?.onCellContextMenu?.(e, val, columnId, row.index, row.original)}
+          />
+        );
+      },
       size: 150, // Varsayılan genişlik
       minSize: 50,
       maxSize: 500,
