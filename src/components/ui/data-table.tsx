@@ -34,7 +34,7 @@ interface DataTableProps<TData, TValue> {
   onDeleteRow?: (index: number) => void
   onUpdateRow?: (index: number, newData: any) => void
   onDeleteMultiple?: (indices: number[]) => void
-  onDeleteColumn?: (columnId: string) => void // Yeni Prop
+  onDeleteColumn?: (columnId: string) => void
   dirtyCells?: Set<string>
   newColumns?: Set<string>
 }
@@ -67,38 +67,35 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode, t: any 
   }
 }
 
-const DataTableRow = React.memo(({ 
-    row, 
-    virtualRow, 
+const DataTableRow = React.memo(({
+    row,
     visibleCells,
-    columnSizingInfo,
     isSelected,
-    tableMeta // Yeni Prop
-}: { 
-    row: Row<any>, 
-    virtualRow: any, 
+    tableMeta,
+    virtualRow
+}: {
+    row: Row<any>,
     visibleCells: any[],
-    columnSizingInfo: any,
     isSelected: boolean,
-    tableMeta?: any // Yeni Tip
+    tableMeta?: any,
+    virtualRow?: { start: number, size: number }
 }) => {
-    void columnSizingInfo;
+    const style = virtualRow ? {
+        transform: `translateY(${virtualRow.start}px)`,
+        height: `${virtualRow.size}px`,
+    } : undefined;
 
     return (
       <TableRow
           data-state={isSelected && "selected"}
-          className="flex hover:bg-muted/50 absolute w-full transition-none border-b items-stretch group"
-          style={{
-              transform: `translateY(${virtualRow.start}px)`,
-              height: `${virtualRow.size}px`,
-          }}
+          className={`flex hover:bg-muted/50 w-full border-b items-stretch group ${virtualRow ? 'absolute' : ''}`}
+          style={style}
       >
           {visibleCells.map((cell) => {
               const isSelectColumn = cell.column.id === "select";
               const columnId = cell.column.id;
               const rowId = row.original?._uId;
-              
-              // Renklendirme mantığı
+
               const isDirty = tableMeta?.dirtyCells?.has(`${rowId}-${columnId}`);
               const isNewColumn = tableMeta?.newColumns?.has(columnId);
 
@@ -108,11 +105,8 @@ const DataTableRow = React.memo(({
                       className={cn(
                         "flex items-center border-r overflow-hidden h-full min-h-[45px]",
                         isSelectColumn ? "p-0" : "p-3",
-                        // Değişen hücreler (Soft Yeşil/Turkuaz)
                         isDirty && "bg-emerald-50/80 dark:bg-emerald-900/20 text-emerald-900 dark:text-emerald-300",
-                        // Yeni sütunlar (Soft Mavi)
                         isNewColumn && "bg-blue-50/60 dark:bg-blue-900/10 text-blue-900 dark:text-blue-300",
-                        // Her ikisi birden (Daha belirgin yeşil)
                         isDirty && isNewColumn && "bg-emerald-100/80 dark:bg-emerald-800/30"
                       )}
                       style={{ width: cell.column.getSize() }}
@@ -126,20 +120,13 @@ const DataTableRow = React.memo(({
       </TableRow>
     );
 }, (prevProps, nextProps) => {
-    // Seçim durumu değişirse KESİN render et
     if (prevProps.isSelected !== nextProps.isSelected) return false;
-
     if (prevProps.row !== nextProps.row) return false;
-    if (prevProps.virtualRow.start !== nextProps.virtualRow.start) return false;
-    
-    // Dirty veya NewColumn Set referansları değiştiyse render et
+    if (prevProps.virtualRow?.start !== nextProps.virtualRow?.start) return false;
     if (prevProps.tableMeta?.dirtyCells !== nextProps.tableMeta?.dirtyCells) return false;
     if (prevProps.tableMeta?.newColumns !== nextProps.tableMeta?.newColumns) return false;
-
     if (prevProps.visibleCells !== nextProps.visibleCells) return false;
-    if (prevProps.columnSizingInfo !== nextProps.columnSizingInfo) return false;
-    
-    return true; 
+    return true;
 });
 
 
@@ -150,18 +137,17 @@ function DataTableInner<TData, TValue>({
   onDeleteRow,
   onUpdateRow,
   onDeleteMultiple,
-  onDeleteColumn, // Eksik olan destructuring eklendi
+  onDeleteColumn,
   dirtyCells,
   newColumns
 }: DataTableProps<TData, TValue>) {
   const { t } = useTranslation();
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = React.useState("")
-  const [searchValue, setSearchValue] = React.useState("") // Yerel arama değeri
+  const [searchValue, setSearchValue] = React.useState("")
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  
-  // Dialog State
+
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [targetRowIndex, setTargetRowIndex] = React.useState<number | null>(null);
   const [editingRowData, setEditingRowData] = React.useState<any | null>(null);
@@ -174,26 +160,23 @@ function DataTableInner<TData, TValue>({
     return () => clearTimeout(timeout);
   }, [searchValue]);
 
-  // Insert Dialog
   const handleOpenInsertDialog = React.useCallback((index: number) => {
     setTargetRowIndex(index);
-    setEditingRowData(null); // Ekleme modu
+    setEditingRowData(null);
     setIsDialogOpen(true);
   }, []);
 
-  // Edit Dialog
   const handleOpenEditDialog = React.useCallback((index: number, data: any) => {
     setTargetRowIndex(index);
-    setEditingRowData(data); // Düzenleme modu
+    setEditingRowData(data);
     setIsDialogOpen(true);
   }, []);
 
-  // Meta nesnesini memoize et (Hücrelerin gereksiz re-render olmasını engeller)
   const tableMeta = React.useMemo(() => ({
     onEditRow: handleOpenEditDialog,
     onInsertRow: handleOpenInsertDialog,
     onDeleteRow: onDeleteRow,
-    onDeleteColumn, // Yeni Eklenen
+    onDeleteColumn,
     dirtyCells,
     newColumns
   }), [handleOpenEditDialog, handleOpenInsertDialog, onDeleteRow, onDeleteColumn, dirtyCells, newColumns]);
@@ -211,36 +194,32 @@ function DataTableInner<TData, TValue>({
     enableColumnResizing: true,
     columnResizeMode: "onChange",
     enableRowSelection: true,
-    getRowId: (_, index) => String(index), // Satırları indeks ile kimliklendir
+    getRowId: (_, index) => String(index),
     state: {
       sorting,
       globalFilter,
       rowSelection,
       columnFilters,
     },
-    // Meta üzerinden fonksiyonları hücrelere taşıyoruz
     meta: tableMeta
   })
 
   const { rows } = table.getRowModel()
-  const columnSizingInfo = table.getState().columnSizingInfo; 
-  
   const tableContainerRef = React.useRef<HTMLDivElement>(null)
+
+  // 500+ satır için virtualization kullan
+  const useVirtual = rows.length > 500
 
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => tableContainerRef.current,
     estimateSize: () => 45,
-    overscan: 10, 
+    overscan: 15,
+    enabled: useVirtual,
   })
 
-  const { getVirtualItems: getVirtualRows, getTotalSize: getTotalRowHeight } = rowVirtualizer
-
-  const virtualRows = getVirtualRows()
-  
   const totalTableWidth = table.getTotalSize()
 
-  // Sütun başlıklarını çıkar (AccessorKey veya ID üzerinden)
   const headers = React.useMemo(() => {
      return columns.map(col => (col as any).accessorKey || col.id || "").filter(Boolean);
   }, [columns]);
@@ -248,10 +227,8 @@ function DataTableInner<TData, TValue>({
   const handleSaveRow = (newData: any) => {
     if (targetRowIndex !== null) {
         if (editingRowData) {
-            // Düzenleme kaydı
             onUpdateRow?.(targetRowIndex, newData);
         } else {
-            // Ekleme kaydı
             onInsertRow?.(targetRowIndex, newData);
         }
     }
@@ -262,20 +239,19 @@ function DataTableInner<TData, TValue>({
     if (onDeleteMultiple && selectedIndices.length > 0) {
         if (confirm(t('table.delete_confirm', { count: selectedIndices.length }))) {
             onDeleteMultiple(selectedIndices);
-            setRowSelection({}); // Seçimi temizle
+            setRowSelection({});
         }
     }
   };
 
   return (
     <div className="flex flex-col h-full gap-4">
-      {/* Generic Row Dialog (Add or Edit) */}
-      <RowFormDialog 
-        open={isDialogOpen} 
+      <RowFormDialog
+        open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         headers={headers}
         sampleData={data as any[]}
-        initialData={editingRowData} 
+        initialData={editingRowData}
         onSave={handleSaveRow}
       />
 
@@ -314,11 +290,11 @@ function DataTableInner<TData, TValue>({
               </div>
             )}
         </div>
-        
+
         {Object.keys(rowSelection).length > 0 && (
-            <Button 
-                variant="destructive" 
-                size="sm" 
+            <Button
+                variant="destructive"
+                size="sm"
                 onClick={handleDeleteSelected}
                 className="animate-in fade-in zoom-in duration-200"
             >
@@ -327,27 +303,27 @@ function DataTableInner<TData, TValue>({
             </Button>
         )}
       </div>
-      
-      <div 
+
+      <div
         ref={tableContainerRef}
         className="rounded-md border flex-1 max-w-full overflow-auto relative bg-card custom-scrollbar"
       >
         <div style={{ width: totalTableWidth, minWidth: '100%', position: 'relative' }}>
-          <table 
+          <table
             className="relative grid w-full caption-bottom text-sm"
             style={{ width: '100%' }}
           >
             <TableHeader className="sticky top-0 bg-background z-30 shadow-md border-b grid w-full">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow 
-                key={headerGroup.id} 
+              <TableRow
+                key={headerGroup.id}
                 className="flex w-full hover:bg-transparent border-none"
               >
                 {headerGroup.headers.map((header) => {
                   const isNew = newColumns?.has(header.id);
                   return (
-                    <TableHead 
-                      key={header.id} 
+                    <TableHead
+                      key={header.id}
                       className={`relative h-10 px-3 flex items-center border-r border-b overflow-hidden group ${isNew ? 'bg-blue-100/60 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' : 'bg-muted/30'}`}
                       style={{ width: header.getSize() }}
                     >
@@ -370,34 +346,47 @@ function DataTableInner<TData, TValue>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody 
+          <TableBody
             className="grid w-full"
-            style={{
-              height: `${getTotalRowHeight()}px`,
-              position: "relative",
-            }}
+            style={useVirtual ? {
+              height: `${rowVirtualizer.getTotalSize()}px`,
+              position: 'relative',
+            } : undefined}
           >
-            {virtualRows.length > 0 ? (
-              virtualRows.map((virtualRow) => {
-                const row = rows[virtualRow.index]
-                const visibleCells = row.getVisibleCells()
-
-                return (
-                  <DataTableRow 
-                    key={row.id} 
-                    row={row} 
-                    virtualRow={virtualRow} 
-                    visibleCells={visibleCells} 
-                    columnSizingInfo={columnSizingInfo}
-                    isSelected={row.getIsSelected()}
-                    tableMeta={tableMeta} // Prop'u geçir
-                  />
-                )
-              })
+            {rows.length > 0 ? (
+              useVirtual ? (
+                rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                  const row = rows[virtualRow.index]
+                  const visibleCells = row.getVisibleCells()
+                  return (
+                    <DataTableRow
+                      key={row.id}
+                      row={row}
+                      visibleCells={visibleCells}
+                      isSelected={row.getIsSelected()}
+                      tableMeta={tableMeta}
+                      virtualRow={virtualRow}
+                    />
+                  )
+                })
+              ) : (
+                rows.map((row) => {
+                  const visibleCells = row.getVisibleCells()
+                  return (
+                    <DataTableRow
+                      key={row.id}
+                      row={row}
+                      visibleCells={visibleCells}
+                      isSelected={row.getIsSelected()}
+                      tableMeta={tableMeta}
+                    />
+                  )
+                })
+              )
             ) : (
               <TableRow className="flex w-full">
-                <TableCell 
-                  colSpan={table.getVisibleLeafColumns().length} 
+                <TableCell
+                  colSpan={table.getVisibleLeafColumns().length}
                   className="h-24 text-center w-full flex items-center justify-center"
                 >
                   {t('table.no_results')}

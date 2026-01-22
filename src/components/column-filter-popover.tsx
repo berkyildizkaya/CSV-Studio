@@ -27,18 +27,31 @@ export function ColumnFilterPopover({
     new Set(currentFilter || [])
   );
 
-  // Popover açıldığında mevcut filtreyi yükle
+  // Unique values - sadece popover açıkken hesapla
+  const [uniqueValuesCache, setUniqueValuesCache] = React.useState<{ values: string[], count: number } | null>(null);
+
+  // Popover açıldığında mevcut filtreyi yükle VE unique values hesapla
   React.useEffect(() => {
     if (open) {
       setSelectedValues(new Set(currentFilter || []));
       setSearchTerm("");
+      // Sadece açıldığında unique values hesapla
+      const result = getColumnUniqueValues(data, columnId, 200);
+      // Değerleri sırala (doğal sıralama - sayılar için de düzgün çalışır)
+      const sortedValues = [...result.uniqueValues].sort((a, b) => {
+        // Boş değerleri sona at
+        if (!a && b) return 1;
+        if (a && !b) return -1;
+        if (!a && !b) return 0;
+        // Doğal sıralama (1, 2, 10 şeklinde)
+        return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+      });
+      setUniqueValuesCache({ values: sortedValues, count: result.totalCount });
     }
-  }, [open, currentFilter]);
+  }, [open, currentFilter, data, columnId]);
 
-  // Unique değerleri hesapla
-  const { uniqueValues, totalCount } = React.useMemo(() => {
-    return getColumnUniqueValues(data, columnId, 200);
-  }, [data, columnId]);
+  const uniqueValues = uniqueValuesCache?.values || [];
+  const totalCount = uniqueValuesCache?.count || 0;
 
   // Arama terimine göre filtrele
   const filteredValues = React.useMemo(() => {

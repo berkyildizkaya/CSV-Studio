@@ -68,7 +68,7 @@ export function useCsv() {
         complete: (results) => {
             const rawData = results.data;
             const headers = rawData.length > 0 ? Object.keys(rawData[0] as object) : [];
-            
+
             // Her satıra takip için benzersiz kimlik ekle
             const dataWithIds = rawData.map((row: any, idx: number) => ({
                 ...row,
