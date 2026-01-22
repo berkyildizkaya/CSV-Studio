@@ -6,9 +6,10 @@ import { SelectCell } from "@/components/select-cell";
 import { FindReplaceDialog } from "@/components/find-replace-dialog";
 import { SaveConfigDialog } from "@/components/save-config-dialog";
 import { ColumnManagerDialog } from "@/components/column-manager-dialog";
+import { AboutDialog } from "@/components/about-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ColumnDef, Column } from "@tanstack/react-table";
-import { ArrowUpDown, Search, Save, ChevronDown, Languages, Columns } from "lucide-react";
+import { ArrowUpDown, Search, Save, ChevronDown, Languages, Columns, Info, Coffee } from "lucide-react";
 import { ColumnFilterPopover } from "@/components/column-filter-popover";
 import { multiSelectFilter } from "@/lib/filter-functions";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -43,6 +44,7 @@ export default function App() {
   const [isFindReplaceOpen, setIsFindReplaceOpen] = useState(false);
   const [isColumnManagerOpen, setIsColumnManagerOpen] = useState(false);
   const [isSaveConfigOpen, setIsSaveConfigOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isSaveAs, setIsSaveAs] = useState(false);
 
   const changeLanguage = (lng: string) => {
@@ -180,7 +182,7 @@ export default function App() {
             >
               {t('app.open_different_file')}
             </button>
-            
+
             <div className="flex items-center rounded-md bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 h-9">
                 <button 
                     onClick={() => handleSaveClick(false)}
@@ -202,6 +204,16 @@ export default function App() {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
+
+            <a
+              href="https://www.buymeacoffee.com/berkyildizkaya"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium bg-[#FFDD00] text-black hover:bg-[#FFDD00]/90 h-9 px-4 shadow-sm"
+            >
+              <Coffee className="w-4 h-4 mr-2" />
+              {t('about.coffee')}
+            </a>
           </div>
         </div>
 
@@ -243,13 +255,50 @@ export default function App() {
             defaultDelimiter={delimiter}
             onConfirm={handleSaveConfigConfirm}
         />
+
+        <AboutDialog open={isAboutOpen} onOpenChange={setIsAboutOpen} />
+
+        <button
+          onClick={() => setIsAboutOpen(true)}
+          className="fixed bottom-4 right-4 z-50 inline-flex items-center justify-center rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 h-10 w-10"
+          title={t('about.title')}
+        >
+          <Info className="w-5 h-5" />
+        </button>
       </div>
     );
   }
 
   // Başlangıç / Yükleme Ekranı
   return (
-    <div className="flex h-screen flex-col items-center justify-center bg-background text-foreground p-8 space-y-8">
+    <div className="relative flex h-screen flex-col items-center justify-center bg-background text-foreground p-8 space-y-8">
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        <ThemeToggle />
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <button className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3">
+                    <Languages className="w-4 h-4 mr-2" />
+                    {i18n.language.toUpperCase()}
+                </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => changeLanguage('tr')}>Türkçe</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage('en')}>English</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage('de')}>Deutsch</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+
+        <a
+          href="https://www.buymeacoffee.com/berkyildizkaya"
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium bg-[#FFDD00] text-black hover:bg-[#FFDD00]/90 h-9 px-4 shadow-sm"
+        >
+          <Coffee className="w-4 h-4 mr-2" />
+          {t('about.coffee')}
+        </a>
+      </div>
+
       <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold tracking-tight">{t('app.title')}</h1>
         <p className="text-muted-foreground">{t('app.subtitle')}</p>
@@ -274,6 +323,16 @@ export default function App() {
           {isLoading ? t('app.loading') : t('app.open_file')}
         </button>
       </div>
+      
+      <button
+        onClick={() => setIsAboutOpen(true)}
+        className="fixed bottom-4 right-4 z-50 inline-flex items-center justify-center rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 h-10 w-10"
+        title={t('about.title')}
+      >
+        <Info className="w-5 h-5" />
+      </button>
+      
+      <AboutDialog open={isAboutOpen} onOpenChange={setIsAboutOpen} />
     </div>
   );
 }

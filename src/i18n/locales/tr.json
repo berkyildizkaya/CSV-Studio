@@ -141,6 +141,14 @@
     "empty_value": "(Boş)",
     "selected_count": "{{count}} seçili",
     "apply": "Uygula"
+  },
+  "about": {
+    "title": "CSV Studio Hakkında",
+    "version": "Sürüm",
+    "author": "Geliştirici",
+    "github": "GitHub Deposu",
+    "coffee": "Bana Bir Kahve Ismarla",
+    "close": "Kapat"
   }
 }
     

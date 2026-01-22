@@ -141,5 +141,13 @@
     "empty_value": "(Empty)",
     "selected_count": "{{count}} selected",
     "apply": "Apply"
+  },
+  "about": {
+    "title": "About CSV Studio",
+    "version": "Version",
+    "author": "Author",
+    "github": "GitHub Repository",
+    "coffee": "Buy Me a Coffee",
+    "close": "Close"
   }
 }
