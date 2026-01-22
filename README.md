@@ -1,62 +1,95 @@
-# CSV Studio 📊
+# CSV Studio ⚡
 
-CSV Studio, **Tauri**, **React** ve **TypeScript** kullanılarak geliştirilmiş modern, hızlı ve hafif bir masaüstü uygulamasıdır. Kullanıcı dostu arayüzü **shadcn/ui** ve **Tailwind CSS** ile tasarlanmıştır.
+> **Modern, Işık Hızında ve Güçlü CSV Düzenleyici**
 
-## 🚀 Başlangıç
+CSV Studio, büyük veri dosyalarını (CSV) zahmetsizce görüntülemeniz, düzenlemeniz ve analiz etmeniz için tasarlanmış yeni nesil bir masaüstü uygulamasıdır. Geleneksel elektronik tablolardaki hantallığı unutun; **Tauri v2** ve **React 19**'un gücüyle donatılmış bu araç, performans ve estetiği bir araya getiriyor.
 
-Bu projeyi bilgisayarınızda çalıştırmak için aşağıdaki adımları takip edebilirsiniz.
+---
+
+## 🔥 Neden CSV Studio?
+
+### 🚀 **Rakipsiz Performans**
+*   **Akıllı Sanallaştırma (Virtualization):** 10.000+ satırlık dosyaları bile milisaniyeler içinde açar. Sadece ekranda gördüğünüz veriyi işler (render eder), bu sayede bellek dostudur ve asla donmaz.
+*   **Hafif Hücre Mimarisi:** "Spreadsheet" mantığıyla optimize edilmiş hücre yapısı sayesinde yağ gibi kayan bir deneyim sunar.
+
+### 🎨 **Modern ve Şık Arayüz**
+*   **Shadcn/UI & Tailwind CSS v4:** Göz yormayan, modern ve minimalist tasarım.
+*   **Karanlık/Aydınlık Mod:** Sistem temanıza uyum sağlayan veya tek tıkla değiştirebileceğiniz tema desteği.
+
+### 🛠️ **Güçlü Düzenleme Araçları**
+*   **Gelişmiş Filtreleme:** Sütun bazlı çoklu seçim filtreleri ile veriyi saniyeler içinde analiz edin.
+*   **Toplu İşlemler:** Çoklu satır silme, sütun taşıma, yeniden adlandırma ve yeni sütun ekleme.
+*   **Bul ve Değiştir:** Büyük/küçük harf duyarlı arama ve toplu değiştirme özelliği.
+*   **Akıllı Veri Tespiti:** Sayı, metin veya boolean değerlerini otomatik tanır ve ona göre düzenleme arayüzü sunar.
+
+### 🌍 **Çoklu Dil Desteği**
+*   Türkçe (TR), İngilizce (EN) ve Almanca (DE) dil seçenekleri ile global kullanıma hazır.
+
+---
+
+## 🛠️ Kullanılan Teknolojiler
+
+Bu proje, en güncel ve güçlü teknolojiler kullanılarak geliştirilmiştir:
+
+*   **Çekirdek:** [Tauri v2](https://tauri.app/) (Rust tabanlı, ultra hafif backend)
+*   **Frontend:** [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
+*   **Dil:** [TypeScript](https://www.typescriptlang.org/)
+*   **Stil:** [Tailwind CSS v4](https://tailwindcss.com/)
+*   **UI Kütüphanesi:** [shadcn/ui](https://ui.shadcn.com/)
+*   **Tablo Altyapısı:** [TanStack Table v8](https://tanstack.com/table) + Virtualizer
+
+---
+
+## 📥 Kurulum ve Çalıştırma
+
+Projeyi bilgisayarınızda çalıştırmak veya geliştirmek isterseniz:
 
 ### Ön Gereksinimler
+*   **Node.js** (LTS sürümü)
+*   **Rust & Cargo** (Tauri için gereklidir)
+*   **Visual Studio Build Tools** (Windows kullanıcıları için C++ workload ile)
 
-Geliştirmeye başlamadan önce bilgisayarınızda aşağıdaki araçların kurulu olduğundan emin olun:
+### Adımlar
 
-1.  **Node.js**: (LTS sürümü önerilir)
-    *   [İndirmek için tıklayın](https://nodejs.org/)
-2.  **Rust & Cargo**:
-    *   [Rustup yükleyicisini indirin](https://rustup.rs/) ve kurun.
-3.  **C++ Build Tools (Sadece Windows için)**:
-    *   [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) indirin.
-    *   Kurulum sırasında **"C++ ile Masaüstü Geliştirme" (Desktop development with C++)** seçeneğini işaretlemeyi unutmayın.
-
-### 📥 Kurulum
-
-1.  Projeyi bilgisayarınıza klonlayın (veya indirin):
+1.  **Projeyi Klonlayın:**
     ```bash
-    git clone https://github.com/kullaniciadi/csv-studio.git
+    git clone https://github.com/berkyildizkaya/csv-studio.git
     cd csv-studio
     ```
 
-2.  Frontend bağımlılıklarını yükleyin:
+2.  **Bağımlılıkları Yükleyin:**
     ```bash
     npm install
     ```
 
-### 💻 Geliştirme Modu (Dev)
+3.  **Geliştirme Modunda Başlatın:**
+    ```bash
+    npm run tauri dev
+    ```
 
-Uygulamayı geliştirme modunda çalıştırmak için:
+4.  **Paketleyin (Build):**
+    ```bash
+    npm run tauri build
+    ```
 
-```bash
-npm run tauri dev
-```
-*Bu komut hem React sunucusunu hem de Tauri masaüstü penceresini açacaktır.*
+---
 
-### 📦 Derleme (Build)
+## ☕ Destek Olun
 
-Uygulamanın dağıtılabilir `.exe` veya `.msi` paketini oluşturmak için:
+Eğer bu proje işinize yaradıysa veya geliştirmemi desteklemek isterseniz, bana bir kahve ısmarlayabilirsiniz! Desteğiniz, projenin sürekliliği ve yeni özellikler için büyük motivasyon kaynağıdır.
 
-```bash
-npm run tauri build
-```
-*Çıktılar `src-tauri/target/release/bundle` klasöründe oluşturulacaktır.*
+<a href="https://www.buymeacoffee.com/berkyildizkaya" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+</a>
 
-## 🛠️ Teknolojiler
-
--   **Core:** [Tauri v2](https://tauri.app/) (Rust)
--   **Frontend:** [React](https://react.dev/) + [Vite](https://vitejs.dev/)
--   **Dil:** TypeScript
--   **Stil:** [Tailwind CSS v4](https://tailwindcss.com/)
--   **UI Bileşenleri:** [shadcn/ui](https://ui.shadcn.com/)
+---
 
 ## 📝 Lisans
 
-Bu proje MIT lisansı ile lisanslanmıştır.
+Bu proje **MIT Lisansı** ile lisanslanmıştır. Özgürce kullanabilir, değiştirebilir ve dağıtabilirsiniz.
+
+---
+
+<p align="center">
+  <sub>❤️ <b>Berk YILDIZKAYA</b> tarafından geliştirilmiştir.</sub>
+</p>
