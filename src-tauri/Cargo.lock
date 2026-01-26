@@ -587,8 +587,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "csv-studio-app"
-version = "0.1.0"
+name = "csv-studio"
+version = "1.0.0"
 dependencies = [
  "serde",
  "serde_json",
