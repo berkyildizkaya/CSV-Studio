@@ -11,7 +11,7 @@ interface AboutDialogProps {
 
 export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
   const { t } = useTranslation();
-  const APP_VERSION = "1.0.0";
+  const APP_VERSION = "1.0.1";
   const APP_AUTHOR = "Berk YILDIZKAYA";
   const GITHUB_URL = "https://github.com/berkyildizkaya/csv-studio";
 

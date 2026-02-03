@@ -135,6 +135,8 @@ const DataTableRow = React.memo(({
           
           {virtualColumns.map((virtualColumn) => {
               const cell = visibleCells[virtualColumn.index];
+              if (!cell) return null;
+
               const isSelectColumn = cell.column.id === "select";
               const columnId = cell.column.id;
               const rowId = row.original?._uId;
@@ -305,8 +307,10 @@ const DataTableInner = React.memo(function DataTableInner<TData, TValue>({
 
   const totalTableWidth = table.getTotalSize()
 
-  const headers = React.useMemo(() => {
-     return columns.map(col => (col as any).accessorKey || col.id || "").filter(Boolean);
+  const dataHeaders = React.useMemo(() => {
+     return columns
+       .map(col => col.id || (col as any).accessorKey || "")
+       .filter(id => id && id !== "select");
   }, [columns]);
 // ... rest of the file ...
 
@@ -355,7 +359,7 @@ const DataTableInner = React.memo(function DataTableInner<TData, TValue>({
       <RowFormDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        headers={headers}
+        headers={dataHeaders}
         sampleData={data as any[]}
         initialData={editingRowData}
         onSave={handleSaveRow}
@@ -548,6 +552,8 @@ const DataTableInner = React.memo(function DataTableInner<TData, TValue>({
 
                 {virtualColumns.map((virtualColumn) => {
                   const header = headerGroup.headers[virtualColumn.index];
+                  if (!header) return null;
+                  
                   const isNew = newColumns?.has(header.id);
                   return (
                     <TableHead
@@ -587,6 +593,8 @@ const DataTableInner = React.memo(function DataTableInner<TData, TValue>({
               useRowVirtual ? (
                 rowVirtualizer.getVirtualItems().map((virtualRow) => {
                   const row = rows[virtualRow.index]
+                  if (!row) return null;
+                  
                   const visibleCells = row.getVisibleCells()
                   return (
                     <DataTableRow
@@ -605,6 +613,7 @@ const DataTableInner = React.memo(function DataTableInner<TData, TValue>({
                 })
               ) : (
                 rows.map((row) => {
+                  if (!row) return null;
                   const visibleCells = row.getVisibleCells()
                   return (
                     <DataTableRow

@@ -104,6 +104,7 @@
     "save_error": "Speicherfehler",
     "load_error": "Dateilesefehler",
     "parse_error": "CSV-Parsing-Fehler",
+    "unnamed_columns_detected": "Unbenannte Spaltenüberschriften erkannt. Sie können diese über das Menü 'Spalten verwalten' entfernen.",
     "no_data_to_save": "Keine Daten zum Speichern gefunden.",
     "save_cancelled": "Speichern abgebrochen.",
     "column_exists": "Spalte existiert bereits"

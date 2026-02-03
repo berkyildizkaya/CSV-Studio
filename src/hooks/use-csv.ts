@@ -86,7 +86,18 @@ export function useCsv() {
                 dirtyCells: new Set(),
                 newColumns: new Set(),
             });
+            
             toast.success(t('toast.file_loaded'));
+
+            // Boş sütun tespiti (örn: sonda fazladan ayırıcı karakter olması)
+            const emptyHeaderCount = headers.filter(h => !h || h.trim() === "").length;
+            if (emptyHeaderCount > 0) {
+                setTimeout(() => {
+                    toast.warning(t('toast.unnamed_columns_detected'), {
+                        duration: 6000,
+                    });
+                }, 500); // Başarı mesajından biraz sonra göster
+            }
         },
         error: (error: Error) => {
             toast.error(`${t('toast.parse_error')}: ${error.message}`);

@@ -104,6 +104,7 @@
     "save_error": "Save error",
     "load_error": "File read error",
     "parse_error": "CSV Parse Error",
+    "unnamed_columns_detected": "Unnamed column headers detected. You can remove them from the 'Manage Columns' menu.",
     "no_data_to_save": "No data found to save.",
     "save_cancelled": "Save cancelled.",
     "column_exists": "Column already exists"
