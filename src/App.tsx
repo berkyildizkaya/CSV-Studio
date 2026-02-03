@@ -61,53 +61,57 @@ export default function App() {
 
   // CSV başlıklarından tablo sütunlarını dinamik olarak oluştur
   const columns = useMemo(() => {
-    const dynamicColumns = headers.map((header) => ({
-      id: header, // Benzersiz ID (accessorKey yerine)
-      accessorFn: (row: any) => row[header], // Veriye doğrudan erişim
-      filterFn: multiSelectFilter,
-      header: ({ column }: { column: Column<any> }) => {
-        return (
-          <div className="flex items-center gap-1 w-full">
-            <button
-              className="flex items-center gap-1 hover:text-primary transition-colors focus:outline-none font-bold text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground flex-1 min-w-0"
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-              <span className="truncate" title={header}>{header}</span>
-              <ArrowUpDown className="h-3 w-3 shrink-0" />
-            </button>
-            <ColumnFilterPopover
-              columnId={header}
-              data={data}
-              currentFilter={column.getFilterValue() as string[] | undefined}
-              onFilterChange={(value) => column.setFilterValue(value)}
-            />
-          </div>
-        )
-      },
-      cell: ({ row, column, getValue, table }) => {
-        const tableMeta = table.options.meta as any;
-        const columnId = column.id;
-        const rowId = row.original?._uId;
-        const isDirty = tableMeta?.dirtyCells?.has(`${rowId}-${columnId}`);
-        const isNewColumn = tableMeta?.newColumns?.has(columnId);
+    const dynamicColumns = headers.map((header, index) => {
+      const columnId = header && header.trim() !== "" ? header : `column-${index}`;
+      
+      return {
+        id: columnId,
+        accessorFn: (row: any) => row[header], // Orijinal key ile veriye eriş
+        filterFn: multiSelectFilter,
+        header: ({ column }: { column: Column<any> }) => {
+          return (
+            <div className="flex items-center gap-1 w-full">
+              <button
+                className="flex items-center gap-1 hover:text-primary transition-colors focus:outline-none font-bold text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground flex-1 min-w-0"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              >
+                <span className="truncate" title={header || columnId}>{header || `[Column ${index + 1}]`}</span>
+                <ArrowUpDown className="h-3 w-3 shrink-0" />
+              </button>
+              <ColumnFilterPopover
+                columnId={columnId}
+                data={data}
+                currentFilter={column.getFilterValue() as string[] | undefined}
+                onFilterChange={(value) => column.setFilterValue(value)}
+              />
+            </div>
+          )
+        },
+        cell: ({ row, column, getValue, table }) => {
+          const tableMeta = table.options.meta as any;
+          const columnId = column.id;
+          const rowId = row.original?._uId;
+          const isDirty = tableMeta?.dirtyCells?.has(`${rowId}-${columnId}`);
+          const isNewColumn = tableMeta?.newColumns?.has(columnId);
 
-        return (
-          <EditableCell
-            value={getValue()}
-            columnId={columnId}
-            isDirty={isDirty}
-            isNewColumn={isNewColumn}
-            onEditClick={(val) => tableMeta?.onEditCell?.(val, columnId, row.index)}
-            onContextMenu={(e, val) => tableMeta?.onCellContextMenu?.(e, val, columnId, row.index, row.original)}
-          />
-        );
-      },
-      size: 150, // Varsayılan genişlik
-      minSize: 50,
-      maxSize: 500,
-      enableSorting: true,
-      enableGlobalFilter: true,
-    } as ColumnDef<any>));
+          return (
+            <EditableCell
+              value={getValue()}
+              columnId={columnId}
+              isDirty={isDirty}
+              isNewColumn={isNewColumn}
+              onEditClick={(val) => tableMeta?.onEditCell?.(val, columnId, row.index)}
+              onContextMenu={(e, val) => tableMeta?.onCellContextMenu?.(e, val, columnId, row.index, row.original)}
+            />
+          );
+        },
+        size: 150,
+        minSize: 50,
+        maxSize: 500,
+        enableSorting: true,
+        enableGlobalFilter: true,
+      } as ColumnDef<any>;
+    });
 
     // Seçim sütununu en başa ekle
     const selectionColumn: ColumnDef<any> = {

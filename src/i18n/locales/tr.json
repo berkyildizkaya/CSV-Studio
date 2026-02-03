@@ -104,6 +104,7 @@
     "save_error": "Kaydetme hatası",
     "load_error": "Dosya okuma hatası",
     "parse_error": "CSV Ayrıştırma Hatası",
+    "unnamed_columns_detected": "İsimsiz sütun başlıkları tespit edildi. Bunları 'Sütunları Yönet' menüsünden temizleyebilirsiniz.",
     "no_data_to_save": "Kaydedilecek veri bulunamadı.",
     "save_cancelled": "Kaydetme iptal edildi.",
     "column_exists": "Sütun zaten mevcut"
